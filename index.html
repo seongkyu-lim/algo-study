@@ -433,7 +433,6 @@
         }
         document.getElementById('loading').style.display = 'none';
         renderStats();
-        showTab('schedule');
     }
 
     function renderStats() {
@@ -453,11 +452,13 @@
         tab.addEventListener('click', () => showTab(tab.dataset.tab));
     });
 
-    function showTab(name) {
+    function showTab(name, pushState = true) {
         currentView = name;
         document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
         document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
         document.getElementById('problem-detail').classList.remove('active');
+
+        if (pushState) location.hash = name;
 
         if (name === 'schedule') {
             document.getElementById('schedule-view').style.display = 'block';
@@ -501,7 +502,7 @@
         }).join('');
     }
 
-    function showDay(dayNum) {
+    function showDay(dayNum, pushState = true) {
         const day = SCHEDULE.find(d => d.day === dayNum);
         if (!day) return;
 
@@ -509,6 +510,8 @@
         const content = document.getElementById('problem-content');
         document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
         detail.classList.add('active');
+
+        if (pushState) location.hash = `day/${dayNum}`;
 
         content.innerHTML = `
             <h2 style="margin:16px 0">Day ${day.day} — ${day.type}</h2>
@@ -544,7 +547,7 @@
         }).join('');
     }
 
-    function showProblem(slug) {
+    function showProblem(slug, pushState = true) {
         const prob = findProblemBySlug(slug);
         if (!prob) return;
 
@@ -552,6 +555,8 @@
         const content = document.getElementById('problem-content');
         document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
         detail.classList.add('active');
+
+        if (pushState) location.hash = `problem/${slug}`;
 
         content.innerHTML = renderProblemSection(prob);
         hljs.highlightAll();
@@ -647,12 +652,38 @@
     }
 
     function goBack() {
-        document.getElementById('problem-detail').classList.remove('active');
-        showTab(currentView);
+        history.back();
     }
 
+    // ============ ROUTING ============
+    function handleRoute() {
+        const hash = location.hash.slice(1); // remove #
+        if (!hash || hash === 'schedule') {
+            showTab('schedule', false);
+        } else if (hash === 'all-problems') {
+            showTab('all-problems', false);
+        } else if (hash === 'members') {
+            showTab('members', false);
+        } else if (hash.startsWith('day/')) {
+            const dayNum = parseInt(hash.split('/')[1]);
+            if (dayNum) showDay(dayNum, false);
+        } else if (hash.startsWith('problem/')) {
+            const slug = hash.split('/').slice(1).join('/');
+            if (slug) showProblem(slug, false);
+        } else {
+            showTab('schedule', false);
+        }
+    }
+
+    window.addEventListener('popstate', handleRoute);
+    window.addEventListener('hashchange', handleRoute);
+
     // ============ INIT ============
-    loadData();
+    async function init() {
+        await loadData();
+        handleRoute();
+    }
+    init();
     </script>
 </body>
 </html>
