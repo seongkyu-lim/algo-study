@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알고리즘 스터디 📚</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/kotlin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #21262d;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --accent2: #3fb950;
+            --accent3: #d2a8ff;
+            --danger: #f85149;
+            --warning: #d29922;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Header */
+        header {
+            border-bottom: 1px solid var(--border);
+            padding: 24px 0;
+            background: var(--surface);
+        }
+        header h1 { font-size: 1.5rem; font-weight: 700; }
+        header h1 span { color: var(--accent); }
+        .header-row { display: flex; align-items: center; justify-content: space-between; }
+        .stats { display: flex; gap: 24px; }
+        .stat { text-align: center; }
+        .stat-num { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 0; border-bottom: 1px solid var(--border);
+            padding-top: 16px; background: var(--surface);
+        }
+        .tab {
+            padding: 8px 16px; cursor: pointer; color: var(--text-muted);
+            border-bottom: 2px solid transparent; font-size: 0.9rem; font-weight: 500;
+            transition: all 0.2s;
+        }
+        .tab:hover { color: var(--text); }
+        .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+        /* Main content */
+        main { padding: 24px 0; }
+
+        /* Day cards */
+        .day-grid { display: flex; flex-direction: column; gap: 12px; }
+        .day-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 16px 20px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .day-card:hover { border-color: var(--accent); transform: translateX(4px); }
+        .day-card.completed { border-left: 3px solid var(--accent2); }
+        .day-header { display: flex; align-items: center; justify-content: space-between; }
+        .day-title { font-weight: 600; font-size: 1rem; }
+        .day-tag {
+            font-size: 0.75rem; padding: 2px 10px; border-radius: 12px;
+            background: var(--surface2); color: var(--accent3); font-weight: 500;
+        }
+        .day-problems {
+            display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;
+        }
+        .problem-chip {
+            font-size: 0.8rem; color: var(--text-muted);
+            display: flex; align-items: center; gap: 4px;
+        }
+        .problem-chip .num { color: var(--accent); font-weight: 600; }
+        .solution-count {
+            font-size: 0.75rem; color: var(--accent2); margin-left: auto;
+            display: flex; align-items: center; gap: 4px;
+        }
+
+        /* Problem detail view */
+        .problem-view { display: none; }
+        .problem-view.active { display: block; }
+        .back-btn {
+            background: none; border: none; color: var(--accent);
+            cursor: pointer; font-size: 0.9rem; padding: 8px 0;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .problem-title-bar {
+            display: flex; align-items: center; gap: 12px; margin: 16px 0;
+        }
+        .problem-title-bar h2 { font-size: 1.3rem; }
+        .difficulty {
+            font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+        }
+        .difficulty.Easy { background: #0d331a; color: var(--accent2); }
+        .difficulty.Medium { background: #332d0d; color: var(--warning); }
+        .difficulty.Hard { background: #330d0d; color: var(--danger); }
+
+        .problem-desc {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 20px; margin-bottom: 20px;
+            font-size: 0.9rem; line-height: 1.8;
+        }
+        .problem-desc code {
+            background: var(--surface2); padding: 2px 6px; border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.85em;
+        }
+        .problem-desc pre {
+            background: var(--surface2); padding: 12px; border-radius: 6px;
+            overflow-x: auto; margin: 8px 0;
+        }
+
+        /* Solutions */
+        .solutions-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .solutions-header h3 { font-size: 1.1rem; }
+        .solution-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; margin-bottom: 12px; overflow: hidden;
+        }
+        .solution-meta {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-bottom: 1px solid var(--border); flex-wrap: wrap;
+        }
+        .solution-author {
+            font-weight: 600; color: var(--accent);
+        }
+        .solution-lang {
+            font-size: 0.75rem; padding: 2px 8px; border-radius: 4px;
+            background: var(--surface2); color: var(--text-muted);
+        }
+        .complexity {
+            font-size: 0.75rem; color: var(--text-muted);
+            display: flex; gap: 12px; margin-left: auto;
+        }
+        .complexity span { display: flex; align-items: center; gap: 4px; }
+        .solution-code {
+            padding: 0; margin: 0;
+        }
+        .solution-code pre {
+            margin: 0; padding: 16px; border-radius: 0;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+        }
+        .solution-notes {
+            padding: 12px 16px; border-top: 1px solid var(--border);
+            font-size: 0.85rem; color: var(--text-muted);
+        }
+        .no-solutions {
+            text-align: center; padding: 48px; color: var(--text-muted);
+        }
+
+        /* Members tab */
+        .members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+        .member-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 20px; text-align: center;
+        }
+        .member-avatar {
+            width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 12px;
+            background: var(--surface2); display: flex; align-items: center;
+            justify-content: center; font-size: 1.5rem;
+        }
+        .member-name { font-weight: 600; margin-bottom: 4px; }
+        .member-count { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* Progress bar */
+        .progress-bar {
+            height: 4px; background: var(--surface2); border-radius: 2px;
+            margin-top: 8px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: var(--accent2); border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        /* Loading */
+        .loading { text-align: center; padding: 48px; color: var(--text-muted); }
+        .spinner {
+            display: inline-block; width: 24px; height: 24px;
+            border: 2px solid var(--border); border-top-color: var(--accent);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .stats { gap: 16px; }
+            .day-problems { flex-direction: column; gap: 4px; }
+            .complexity { margin-left: 0; margin-top: 4px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-row">
+                <h1>📚 <span>알고리즘 스터디</span></h1>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-num" id="total-problems">0</div>
+                        <div class="stat-label">문제</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num" id="total-solutions">0</div>
+                        <div class="stat-label">풀이</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num" id="total-members">0</div>
+                        <div class="stat-label">멤버</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="tabs">
+                <div class="tab active" data-tab="schedule">📅 커리큘럼</div>
+                <div class="tab" data-tab="all-problems">📝 전체 풀이</div>
+                <div class="tab" data-tab="members">👥 멤버</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="margin-top:12px">데이터 불러오는 중...</p>
+        </div>
+
+        <div id="schedule-view" class="tab-content" style="display:none">
+            <div class="day-grid" id="day-grid"></div>
+        </div>
+
+        <div id="all-problems-view" class="tab-content" style="display:none">
+            <div class="day-grid" id="all-problems-grid"></div>
+        </div>
+
+        <div id="members-view" class="tab-content" style="display:none">
+            <div class="members-grid" id="members-grid"></div>
+        </div>
+
+        <div id="problem-detail" class="problem-view">
+            <button class="back-btn" onclick="goBack()">← 뒤로</button>
+            <div id="problem-content"></div>
+        </div>
+    </main>
+
+    <script>
+    // ============ STUDY SCHEDULE (LeetCode 75) ============
+    const SCHEDULE = [
+        { day: 1, type: "Array / String", problems: [
+            { id: "1768", name: "Merge Strings Alternately", slug: "merge-strings-alternately", difficulty: "Easy" },
+            { id: "1071", name: "Greatest Common Divisor of Strings", slug: "greatest-common-divisor-of-strings", difficulty: "Easy" }
+        ]},
+        { day: 2, type: "Binary Tree (DFS)", problems: [
+            { id: "0104", name: "Max Depth of Tree", slug: "maximum-depth-of-binary-tree", difficulty: "Easy" },
+            { id: "0904", name: "Leaf-Similar Trees", slug: "leaf-similar-trees", difficulty: "Easy" }
+        ]},
+        { day: 3, type: "Two Pointers", problems: [
+            { id: "0283", name: "Move Zeroes", slug: "move-zeroes", difficulty: "Easy" },
+            { id: "0392", name: "Is Subsequence", slug: "is-subsequence", difficulty: "Easy" }
+        ]},
+        { day: 4, type: "Graphs (DFS)", problems: [
+            { id: "0841", name: "Keys and Rooms", slug: "keys-and-rooms", difficulty: "Medium" },
+            { id: "0547", name: "Number of Provinces", slug: "number-of-provinces", difficulty: "Medium" }
+        ]},
+        { day: 5, type: "Sliding Window", problems: [
+            { id: "0643", name: "Max Average Subarray I", slug: "maximum-average-subarray-i", difficulty: "Easy" },
+            { id: "1456", name: "Max Vowels in Substring", slug: "maximum-number-of-vowels-in-a-substring-of-given-length", difficulty: "Medium" }
+        ]},
+        { day: 6, type: "DP (1D)", problems: [
+            { id: "1137", name: "Tribonacci Number", slug: "n-th-tribonacci-number", difficulty: "Easy" },
+            { id: "0746", name: "Min Cost Climbing Stairs", slug: "min-cost-climbing-stairs", difficulty: "Easy" }
+        ]},
+        { day: 7, type: "Hash Map / Set", problems: [
+            { id: "2215", name: "Find Difference of Arrays", slug: "find-the-difference-of-two-arrays", difficulty: "Easy" },
+            { id: "1207", name: "Unique Occurrences", slug: "unique-number-of-occurrences", difficulty: "Easy" }
+        ]},
+        { day: 8, type: "Binary Search", problems: [
+            { id: "0374", name: "Guess Number Higher/Lower", slug: "guess-number-higher-or-lower", difficulty: "Easy" },
+            { id: "2300", name: "Successful Pairs", slug: "successful-pairs-of-spells-and-potions", difficulty: "Medium" }
+        ]},
+        { day: 9, type: "Linked List", problems: [
+            { id: "2095", name: "Delete Middle Node", slug: "delete-the-middle-node-of-a-linked-list", difficulty: "Medium" },
+            { id: "0328", name: "Odd Even Linked List", slug: "odd-even-linked-list", difficulty: "Medium" }
+        ]},
+        { day: 10, type: "Stack", problems: [
+            { id: "2390", name: "Removing Stars", slug: "removing-stars-from-a-string", difficulty: "Medium" },
+            { id: "0735", name: "Asteroid Collision", slug: "asteroid-collision", difficulty: "Medium" }
+        ]},
+        { day: 11, type: "Heap (Priority Queue)", problems: [
+            { id: "0215", name: "Kth Largest Element", slug: "kth-largest-element-in-an-array", difficulty: "Medium" },
+            { id: "2336", name: "Smallest Number in Set", slug: "smallest-number-in-infinite-set", difficulty: "Medium" }
+        ]},
+        { day: 12, type: "Prefix Sum", problems: [
+            { id: "1732", name: "Highest Altitude", slug: "find-the-highest-altitude", difficulty: "Easy" },
+            { id: "0724", name: "Find Pivot Index", slug: "find-pivot-index", difficulty: "Easy" }
+        ]},
+        { day: 13, type: "Queue / BFS", problems: [
+            { id: "0933", name: "Number of Recent Calls", slug: "number-of-recent-calls", difficulty: "Easy" },
+            { id: "0649", name: "Dota2 Senate", slug: "dota2-senate", difficulty: "Medium" }
+        ]},
+        { day: 14, type: "Bit Manipulation", problems: [
+            { id: "0338", name: "Counting Bits", slug: "counting-bits", difficulty: "Easy" },
+            { id: "0191", name: "Number of 1 Bits", slug: "number-of-1-bits", difficulty: "Easy" }
+        ]},
+        { day: 15, type: "Array / String", problems: [
+            { id: "1431", name: "Kids With Candies", slug: "kids-with-the-greatest-number-of-candies", difficulty: "Easy" },
+            { id: "0605", name: "Can Place Flowers", slug: "can-place-flowers", difficulty: "Easy" }
+        ]},
+        { day: 16, type: "Binary Tree (DFS)", problems: [
+            { id: "1448", name: "Good Nodes in Tree", slug: "count-good-nodes-in-binary-tree", difficulty: "Medium" },
+            { id: "0437", name: "Path Sum III", slug: "path-sum-iii", difficulty: "Medium" }
+        ]},
+        { day: 17, type: "Two Pointers", problems: [
+            { id: "0011", name: "Container With Most Water", slug: "container-with-most-water", difficulty: "Medium" },
+            { id: "1679", name: "Max Number of K-Sum Pairs", slug: "max-number-of-k-sum-pairs", difficulty: "Medium" }
+        ]},
+        { day: 18, type: "Graphs (DFS)", problems: [
+            { id: "1466", name: "Reorder Routes", slug: "reorder-routes-to-make-all-paths-lead-to-the-city-zero", difficulty: "Medium" },
+            { id: "0399", name: "Evaluate Division", slug: "evaluate-division", difficulty: "Medium" }
+        ]},
+        { day: 19, type: "Sliding Window", problems: [
+            { id: "1004", name: "Max Consecutive Ones III", slug: "max-consecutive-ones-iii", difficulty: "Medium" },
+            { id: "1493", name: "Longest Subarray of 1's", slug: "longest-subarray-of-1s-after-deleting-one-element", difficulty: "Medium" }
+        ]},
+        { day: 20, type: "DP (1D)", problems: [
+            { id: "0198", name: "House Robber", slug: "house-robber", difficulty: "Medium" },
+            { id: "0790", name: "Domino and Tromino", slug: "domino-and-tromino-tiling", difficulty: "Medium" }
+        ]},
+        { day: 21, type: "Hash Map / Set", problems: [
+            { id: "1657", name: "Strings Are Close", slug: "determine-if-two-strings-are-close", difficulty: "Medium" },
+            { id: "2352", name: "Equal Row/Col Pairs", slug: "equal-row-and-column-pairs", difficulty: "Medium" }
+        ]},
+        { day: 22, type: "Binary Search", problems: [
+            { id: "0162", name: "Find Peak Element", slug: "find-peak-element", difficulty: "Medium" },
+            { id: "0875", name: "Koko Eating Bananas", slug: "koko-eating-bananas", difficulty: "Medium" }
+        ]},
+        { day: 23, type: "Linked List", problems: [
+            { id: "0206", name: "Reverse Linked List", slug: "reverse-linked-list", difficulty: "Easy" },
+            { id: "2130", name: "Max Twin Sum", slug: "maximum-twin-sum-of-a-linked-list", difficulty: "Medium" }
+        ]},
+        { day: 24, type: "Array / String", problems: [
+            { id: "0345", name: "Reverse Vowels", slug: "reverse-vowels-of-a-string", difficulty: "Easy" },
+            { id: "0151", name: "Reverse Words", slug: "reverse-words-in-a-string", difficulty: "Medium" }
+        ]},
+        { day: 25, type: "Heap (Priority Queue)", problems: [
+            { id: "2542", name: "Max Subsequence Score", slug: "maximum-subsequence-score", difficulty: "Medium" },
+            { id: "2462", name: "Total Cost to Hire K", slug: "total-cost-to-hire-k-workers", difficulty: "Medium" }
+        ]},
+        { day: 26, type: "Binary Tree (DFS)", problems: [
+            { id: "1372", name: "Longest ZigZag Path", slug: "longest-zigzag-path-in-a-binary-tree", difficulty: "Medium" },
+            { id: "0236", name: "Lowest Common Ancestor", slug: "lowest-common-ancestor-of-a-binary-tree", difficulty: "Medium" }
+        ]},
+        { day: 27, type: "Binary Tree (BFS)", problems: [
+            { id: "0199", name: "Tree Right Side View", slug: "binary-tree-right-side-view", difficulty: "Medium" },
+            { id: "1161", name: "Max Level Sum", slug: "maximum-level-sum-of-a-binary-tree", difficulty: "Medium" }
+        ]},
+        { day: 28, type: "Graphs (BFS)", problems: [
+            { id: "1926", name: "Nearest Exit", slug: "nearest-exit-from-entrance-in-maze", difficulty: "Medium" },
+            { id: "0994", name: "Rotting Oranges", slug: "rotting-oranges", difficulty: "Medium" }
+        ]},
+        { day: 29, type: "DP (Multi)", problems: [
+            { id: "0062", name: "Unique Paths", slug: "unique-paths", difficulty: "Medium" },
+            { id: "1143", name: "Longest Common Subsequence", slug: "longest-common-subsequence", difficulty: "Medium" }
+        ]},
+        { day: 30, type: "Trie", problems: [
+            { id: "0208", name: "Implement Trie", slug: "implement-trie-prefix-tree", difficulty: "Medium" },
+            { id: "1268", name: "Search Suggestions", slug: "search-suggestions-system", difficulty: "Medium" }
+        ]},
+        { day: 31, type: "Monotonic Stack", problems: [
+            { id: "0739", name: "Daily Temperatures", slug: "daily-temperatures", difficulty: "Medium" },
+            { id: "0901", name: "Online Stock Span", slug: "online-stock-span", difficulty: "Medium" }
+        ]},
+        { day: 32, type: "Intervals", problems: [
+            { id: "0435", name: "Non-overlapping Intervals", slug: "non-overlapping-intervals", difficulty: "Medium" },
+            { id: "0452", name: "Min Arrows to Balloons", slug: "minimum-number-of-arrows-to-burst-balloons", difficulty: "Medium" }
+        ]},
+        { day: 33, type: "Backtracking", problems: [
+            { id: "0017", name: "Letter Combinations", slug: "letter-combinations-of-a-phone-number", difficulty: "Medium" },
+            { id: "0216", name: "Combination Sum III", slug: "combination-sum-iii", difficulty: "Medium" }
+        ]},
+        { day: 34, type: "Binary Search Tree", problems: [
+            { id: "0700", name: "Search in a BST", slug: "search-in-a-binary-search-tree", difficulty: "Easy" },
+            { id: "0450", name: "Delete Node in BST", slug: "delete-node-in-a-bst", difficulty: "Medium" }
+        ]},
+        { day: 35, type: "Array / String", problems: [
+            { id: "0238", name: "Product Except Self", slug: "product-of-array-except-self", difficulty: "Medium" },
+            { id: "0334", name: "Increasing Triplet", slug: "increasing-triplet-subsequence", difficulty: "Medium" }
+        ]},
+        { day: 36, type: "DP (Multi)", problems: [
+            { id: "0714", name: "Stock Transaction Fee", slug: "best-time-to-buy-and-sell-stock-with-transaction-fee", difficulty: "Medium" },
+            { id: "0072", name: "Edit Distance", slug: "edit-distance", difficulty: "Medium" }
+        ]},
+        { day: 37, type: "Bit Manipulation", problems: [
+            { id: "0136", name: "Single Number", slug: "single-number", difficulty: "Easy" },
+            { id: "1318", name: "Minimum Flips (OR)", slug: "minimum-flips-to-make-a-or-b-equal-to-c", difficulty: "Medium" }
+        ]},
+        { day: 38, type: "String / Decode", problems: [
+            { id: "0443", name: "String Compression", slug: "string-compression", difficulty: "Medium" },
+            { id: "0394", name: "Decode String", slug: "decode-string", difficulty: "Medium" }
+        ]}
+    ];
+
+    // ============ DATA ============
+    let solutionsData = {};
+    let currentView = 'schedule';
+
+    async function loadData() {
+        try {
+            const resp = await fetch('data/solutions.json');
+            if (resp.ok) {
+                solutionsData = await resp.json();
+            }
+        } catch(e) {
+            console.log('No solutions data yet');
+        }
+        document.getElementById('loading').style.display = 'none';
+        renderStats();
+        showTab('schedule');
+    }
+
+    function renderStats() {
+        const totalProblems = SCHEDULE.reduce((a, d) => a + d.problems.length, 0);
+        const allSolutions = Object.values(solutionsData);
+        const totalSolutions = allSolutions.reduce((a, s) => a + s.solutions.length, 0);
+        const members = new Set();
+        allSolutions.forEach(s => s.solutions.forEach(sol => members.add(sol.author)));
+
+        document.getElementById('total-problems').textContent = totalProblems;
+        document.getElementById('total-solutions').textContent = totalSolutions;
+        document.getElementById('total-members').textContent = members.size;
+    }
+
+    // ============ TABS ============
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => showTab(tab.dataset.tab));
+    });
+
+    function showTab(name) {
+        currentView = name;
+        document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        document.getElementById('problem-detail').classList.remove('active');
+
+        if (name === 'schedule') {
+            document.getElementById('schedule-view').style.display = 'block';
+            renderSchedule();
+        } else if (name === 'all-problems') {
+            document.getElementById('all-problems-view').style.display = 'block';
+            renderAllProblems();
+        } else if (name === 'members') {
+            document.getElementById('members-view').style.display = 'block';
+            renderMembers();
+        }
+    }
+
+    // ============ SCHEDULE VIEW ============
+    function renderSchedule() {
+        const grid = document.getElementById('day-grid');
+        grid.innerHTML = SCHEDULE.map(day => {
+            const solCounts = day.problems.map(p => {
+                const key = findSolutionKey(p);
+                return key && solutionsData[key] ? solutionsData[key].solutions.length : 0;
+            });
+            const totalSol = solCounts.reduce((a,b) => a+b, 0);
+            const hasAny = totalSol > 0;
+
+            return `
+            <div class="day-card ${hasAny ? 'completed' : ''}" onclick="showDay(${day.day})">
+                <div class="day-header">
+                    <div class="day-title">Day ${day.day}</div>
+                    <div class="day-tag">${day.type}</div>
+                    ${totalSol > 0 ? `<div class="solution-count">✅ ${totalSol} 풀이</div>` : ''}
+                </div>
+                <div class="day-problems">
+                    ${day.problems.map((p, i) => `
+                        <div class="problem-chip">
+                            <span class="num">#${p.id}</span> ${p.name}
+                            ${solCounts[i] > 0 ? `<span style="color:var(--accent2)">(${solCounts[i]})</span>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function showDay(dayNum) {
+        const day = SCHEDULE.find(d => d.day === dayNum);
+        if (!day) return;
+
+        const detail = document.getElementById('problem-detail');
+        const content = document.getElementById('problem-content');
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        detail.classList.add('active');
+
+        content.innerHTML = `
+            <h2 style="margin:16px 0">Day ${day.day} — ${day.type}</h2>
+            ${day.problems.map(p => renderProblemSection(p)).join('')}
+        `;
+        hljs.highlightAll();
+    }
+
+    // ============ ALL PROBLEMS VIEW ============
+    function renderAllProblems() {
+        const grid = document.getElementById('all-problems-grid');
+        const allProblems = [];
+        SCHEDULE.forEach(day => {
+            day.problems.forEach(p => {
+                allProblems.push({ ...p, day: day.day, type: day.type });
+            });
+        });
+
+        grid.innerHTML = allProblems.map(p => {
+            const key = findSolutionKey(p);
+            const sol = key && solutionsData[key] ? solutionsData[key] : null;
+            const count = sol ? sol.solutions.length : 0;
+            return `
+            <div class="day-card ${count > 0 ? 'completed' : ''}" onclick="showProblem('${p.slug}')">
+                <div class="day-header">
+                    <div class="day-title">
+                        <span class="difficulty ${p.difficulty}" style="font-size:0.7rem;margin-right:8px">${p.difficulty}</span>
+                        #${p.id} ${p.name}
+                    </div>
+                    ${count > 0 ? `<div class="solution-count">✅ ${count}</div>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function showProblem(slug) {
+        const prob = findProblemBySlug(slug);
+        if (!prob) return;
+
+        const detail = document.getElementById('problem-detail');
+        const content = document.getElementById('problem-content');
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        detail.classList.add('active');
+
+        content.innerHTML = renderProblemSection(prob);
+        hljs.highlightAll();
+    }
+
+    // ============ MEMBERS VIEW ============
+    function renderMembers() {
+        const members = {};
+        Object.values(solutionsData).forEach(s => {
+            s.solutions.forEach(sol => {
+                if (!members[sol.author]) members[sol.author] = { count: 0, langs: new Set() };
+                members[sol.author].count++;
+                members[sol.author].langs.add(sol.language);
+            });
+        });
+
+        const grid = document.getElementById('members-grid');
+        const entries = Object.entries(members).sort((a,b) => b[1].count - a[1].count);
+
+        if (entries.length === 0) {
+            grid.innerHTML = '<div class="no-solutions">아직 풀이가 없습니다</div>';
+            return;
+        }
+
+        const totalProblems = SCHEDULE.reduce((a, d) => a + d.problems.length, 0);
+        grid.innerHTML = entries.map(([name, data]) => {
+            const pct = Math.round(data.count / totalProblems * 100);
+            return `
+            <div class="member-card">
+                <div class="member-avatar">${name[0].toUpperCase()}</div>
+                <div class="member-name">${name}</div>
+                <div class="member-count">${data.count}문제 풀이 · ${[...data.langs].join(', ')}</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">${pct}% 완료</div>
+            </div>`;
+        }).join('');
+    }
+
+    // ============ HELPERS ============
+    function findSolutionKey(problem) {
+        // Match by folder name pattern: NNNN-slug
+        const padded = problem.id.padStart(4, '0');
+        const keys = Object.keys(solutionsData);
+        return keys.find(k => k.startsWith(padded)) || null;
+    }
+
+    function findProblemBySlug(slug) {
+        for (const day of SCHEDULE) {
+            for (const p of day.problems) {
+                if (p.slug === slug) return p;
+            }
+        }
+        return null;
+    }
+
+    function renderProblemSection(problem) {
+        const key = findSolutionKey(problem);
+        const data = key && solutionsData[key] ? solutionsData[key] : null;
+
+        return `
+        <div style="margin-bottom:32px">
+            <div class="problem-title-bar">
+                <h2>#${problem.id} ${problem.name}</h2>
+                <span class="difficulty ${problem.difficulty}">${problem.difficulty}</span>
+                <a href="https://leetcode.com/problems/${problem.slug}/" target="_blank"
+                   style="color:var(--accent);font-size:0.85rem;margin-left:auto">LeetCode →</a>
+            </div>
+            ${data && data.description ? `<div class="problem-desc">${data.description}</div>` : ''}
+            <div class="solutions-header">
+                <h3>풀이 (${data ? data.solutions.length : 0})</h3>
+            </div>
+            ${data && data.solutions.length > 0 ? data.solutions.map(sol => `
+                <div class="solution-card">
+                    <div class="solution-meta">
+                        <span class="solution-author">${sol.author}</span>
+                        <span class="solution-lang">${sol.language}</span>
+                        <div class="complexity">
+                            ${sol.timeComplexity ? `<span>⏱ ${sol.timeComplexity}</span>` : ''}
+                            ${sol.spaceComplexity ? `<span>💾 ${sol.spaceComplexity}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="solution-code">
+                        <pre><code class="language-${sol.language.toLowerCase()}">${escapeHtml(sol.code)}</code></pre>
+                    </div>
+                    ${sol.notes ? `<div class="solution-notes">${sol.notes}</div>` : ''}
+                </div>
+            `).join('') : '<div class="no-solutions">아직 풀이가 없습니다. 레포에 push하면 자동 반영됩니다! 🚀</div>'}
+        </div>`;
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function goBack() {
+        document.getElementById('problem-detail').classList.remove('active');
+        showTab(currentView);
+    }
+
+    // ============ INIT ============
+    loadData();
+    </script>
+</body>
+</html>

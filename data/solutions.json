@@ -1,0 +1,605 @@
+{
+  "0001-two-sum": {
+    "folder": "0001-two-sum",
+    "description": "<h2><a href=\"https://leetcode.com/problems/two-sum\">1. Two Sum</a></h2><h3>Easy</h3><hr><p>Given an array of integers <code>nums</code>&nbsp;and an integer <code>target</code>, return <em>indices of the two numbers such that they add up to <code>target</code></em>.</p>\n\n<p>You may assume that each input would have <strong><em>exactly</em> one solution</strong>, and you may not use the <em>same</em> element twice.</p>\n\n<p>You can return the answer in any order.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [2,7,11,15], target = 9\n<strong>Output:</strong> [0,1]\n<strong>Explanation:</strong> Because nums[0] + nums[1] == 9, we return [0, 1].\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [3,2,4], target = 6\n<strong>Output:</strong> [1,2]\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [3,3], target = 6\n<strong>Output:</strong> [0,1]\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>2 &lt;= nums.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>-10<sup>9</sup> &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>\n\t<li><code>-10<sup>9</sup> &lt;= target &lt;= 10<sup>9</sup></code></li>\n\t<li><strong>Only one valid answer exists.</strong></li>\n</ul>\n\n<p>&nbsp;</p>\n<strong>Follow-up:&nbsp;</strong>Can you come up with an algorithm that is less than <code>O(n<sup>2</sup>)</code><font face=\"monospace\">&nbsp;</font>time complexity?",
+    "solutions": [
+      {
+        "filename": "0001-two-sum.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    fun twoSum(nums: IntArray, target: Int): IntArray {\n        val indexMap = mutableMapOf<Int, MutableList<Int>>()  // 값과 인덱스를 저장할 맵\n\n        // 배열을 순회하면서 값과 그 값의 인덱스를 맵에 추가\n        nums.forEachIndexed { index, value ->\n            indexMap.computeIfAbsent(value) { mutableListOf() }.add(index)\n        }\n\n        // 두 수의 합을 찾기\n        for (index in nums.indices) {\n            val complement = target - nums[index]\n            // 보완 값이 맵에 있는지 확인\n            if (indexMap.containsKey(complement)) {\n                // 인덱스 리스트에서 현재 인덱스를 제외하고 반환\n                val indices = indexMap[complement]\n                if (indices != null) {\n                    for (idx in indices) {\n                        if (idx != index) {  // 현재 인덱스가 아니어야 함\n                            return intArrayOf(index, idx)\n                        }\n                    }\n                }\n            }\n        }\n        return intArrayOf() // 결과를 찾지 못했을 경우 빈 배열 반환\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0002-add-two-numbers": {
+    "folder": "0002-add-two-numbers",
+    "description": "<h2><a href=\"https://leetcode.com/problems/add-two-numbers\">2. Add Two Numbers</a></h2><h3>Medium</h3><hr><p>You are given two <strong>non-empty</strong> linked lists representing two non-negative integers. The digits are stored in <strong>reverse order</strong>, and each of their nodes contains a single digit. Add the two numbers and return the sum&nbsp;as a linked list.</p>\n\n<p>You may assume the two numbers do not contain any leading zero, except the number 0 itself.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/10/02/addtwonumber1.jpg\" style=\"width: 483px; height: 342px;\" />\n<pre>\n<strong>Input:</strong> l1 = [2,4,3], l2 = [5,6,4]\n<strong>Output:</strong> [7,0,8]\n<strong>Explanation:</strong> 342 + 465 = 807.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> l1 = [0], l2 = [0]\n<strong>Output:</strong> [0]\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]\n<strong>Output:</strong> [8,9,9,9,0,0,0,1]\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in each linked list is in the range <code>[1, 100]</code>.</li>\n\t<li><code>0 &lt;= Node.val &lt;= 9</code></li>\n\t<li>It is guaranteed that the list represents a number that does not have leading zeros.</li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0002-add-two-numbers.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "/**\n * Example:\n * var li = ListNode(5)\n * var v = li.`val`\n * Definition for singly-linked list.\n * class ListNode(var `val`: Int) {\n *     var next: ListNode? = null\n * }\n */\nclass Solution {\n    fun addTwoNumbers(l1: ListNode?, l2: ListNode?): ListNode? {\n        var firstNode = l1\n        var secondNode = l2\n        var carry = 0\n        val dummyHead = ListNode(0)\n        var currentNode = dummyHead\n\n        while (firstNode != null || secondNode != null || carry != 0) {\n            val firstVal = firstNode?.`val` ?: 0\n            val secondVal = secondNode?.`val` ?: 0\n            \n            // 현재 자리 수 더하고, 올림수(carry) 계산\n            val sum = firstVal + secondVal + carry\n            carry = sum / 10  // carry는 sum을 10으로 나눈 몫\n            val digit = sum % 10  // 각 자릿수는 sum을 10으로 나눈 나머지\n\n            // 새로운 노드를 생성하여 currentNode에 연결\n            currentNode.next = ListNode(digit)\n            currentNode = currentNode.next!!\n\n            // 각 리스트의 다음 노드로 이동\n            firstNode = firstNode?.next\n            secondNode = secondNode?.next\n        }\n\n        return dummyHead.next\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0003-longest-substring-without-repeating-characters": {
+    "folder": "0003-longest-substring-without-repeating-characters",
+    "description": "<h2><a href=\"https://leetcode.com/problems/longest-substring-without-repeating-characters\">3. Longest Substring Without Repeating Characters</a></h2><h3>Medium</h3><hr><p>Given a string <code>s</code>, find the length of the <strong>longest</strong> <span data-keyword=\"substring-nonempty\"><strong>substring</strong></span> without repeating characters.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;abcabcbb&quot;\n<strong>Output:</strong> 3\n<strong>Explanation:</strong> The answer is &quot;abc&quot;, with the length of 3.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;bbbbb&quot;\n<strong>Output:</strong> 1\n<strong>Explanation:</strong> The answer is &quot;b&quot;, with the length of 1.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;pwwkew&quot;\n<strong>Output:</strong> 3\n<strong>Explanation:</strong> The answer is &quot;wke&quot;, with the length of 3.\nNotice that the answer must be a substring, &quot;pwke&quot; is a subsequence and not a substring.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>0 &lt;= s.length &lt;= 5 * 10<sup>4</sup></code></li>\n\t<li><code>s</code> consists of English letters, digits, symbols and spaces.</li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0003-longest-substring-without-repeating-characters.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    fun lengthOfLongestSubstring(s: String): Int {\n        var maxLength = 0\n        var start = 0\n        val charSet = mutableSetOf<Char>()\n\n        s.forEachIndexed { end, char ->\n            while (charSet.contains(char)) {\n                charSet.remove(s[start++])\n            }\n            charSet.add(char)\n            maxLength = maxOf(maxLength, end - start + 1)\n        }\n        \n        return maxLength\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0011-container-with-most-water": {
+    "folder": "0011-container-with-most-water",
+    "description": "<h2><a href=\"https://leetcode.com/problems/container-with-most-water\">11. Container With Most Water</a></h2><h3>Medium</h3><hr><p>You are given an integer array <code>height</code> of length <code>n</code>. There are <code>n</code> vertical lines drawn such that the two endpoints of the <code>i<sup>th</sup></code> line are <code>(i, 0)</code> and <code>(i, height[i])</code>.</p>\n\n<p>Find two lines that together with the x-axis form a container, such that the container contains the most water.</p>\n\n<p>Return <em>the maximum amount of water a container can store</em>.</p>\n\n<p><strong>Notice</strong> that you may not slant the container.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://s3-lc-upload.s3.amazonaws.com/uploads/2018/07/17/question_11.jpg\" style=\"width: 600px; height: 287px;\" />\n<pre>\n<strong>Input:</strong> height = [1,8,6,2,5,4,8,3,7]\n<strong>Output:</strong> 49\n<strong>Explanation:</strong> The above vertical lines are represented by array [1,8,6,2,5,4,8,3,7]. In this case, the max area of water (blue section) the container can contain is 49.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> height = [1,1]\n<strong>Output:</strong> 1\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>n == height.length</code></li>\n\t<li><code>2 &lt;= n &lt;= 10<sup>5</sup></code></li>\n\t<li><code>0 &lt;= height[i] &lt;= 10<sup>4</sup></code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0011-container-with-most-water.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    fun maxArea(height: IntArray): Int {\n        var maxArea = 0\n        var left = 0\n        var right = height.size - 1\n        \n        while (left < right) {\n            val area = minOf(height[left], height[right]) * (right - left)\n            maxArea = maxOf(maxArea, area)\n            \n            // Move the pointer pointing to the shorter height\n            if (height[left] < height[right]) {\n                left++\n            } else {\n                right--\n            }\n        }\n        \n        return maxArea\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0016-3sum-closest": {
+    "folder": "0016-3sum-closest",
+    "description": "<h2><a href=\"https://leetcode.com/problems/3sum-closest\">16. 3Sum Closest</a></h2><h3>Medium</h3><hr><p>Given an integer array <code>nums</code> of length <code>n</code> and an integer <code>target</code>, find three integers in <code>nums</code> such that the sum is closest to <code>target</code>.</p>\n\n<p>Return <em>the sum of the three integers</em>.</p>\n\n<p>You may assume that each input would have exactly one solution.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [-1,2,1,-4], target = 1\n<strong>Output:</strong> 2\n<strong>Explanation:</strong> The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [0,0,0], target = 1\n<strong>Output:</strong> 0\n<strong>Explanation:</strong> The sum that is closest to the target is 0. (0 + 0 + 0 = 0).\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>3 &lt;= nums.length &lt;= 500</code></li>\n\t<li><code>-1000 &lt;= nums[i] &lt;= 1000</code></li>\n\t<li><code>-10<sup>4</sup> &lt;= target &lt;= 10<sup>4</sup></code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0016-3sum-closest.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    /*\n    Data structure : array\n    algo : search\n    ps : two-pointer\n    */\n    fun threeSumClosest(nums: IntArray, target: Int): Int {\n        nums.sort() // 정렬\n        return (0 until nums.size - 2) // 마지막 두 요소를 제외한 인덱스\n            .fold(Int.MAX_VALUE) { closestSum, i ->\n                // 두 포인터 초기화\n                var left = i + 1\n                var right = nums.lastIndex\n                \n                var currentClosest = closestSum\n                while (left < right) {\n                    val currentSum = nums[i] + nums[left] + nums[right]\n                    \n                    // 현재 가까운 값 갱신\n                    if (Math.abs(target - currentSum) < Math.abs(target - currentClosest)) {\n                        currentClosest = currentSum\n                    }\n\n                    when {\n                        currentSum < target -> left++ // 타겟보다 작으면 왼쪽 포인터 이동\n                        currentSum > target -> right-- // 타겟보다 크면 오른쪽 포인터 이동\n                        else -> return currentSum // 정확히 일치하면 즉시 반환\n                    }\n                }\n                \n                // 더 가까운 값 반환\n                if (Math.abs(target - currentClosest) < Math.abs(target - closestSum)) {\n                    currentClosest\n                } else {\n                    closestSum\n                }            }\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0026-remove-duplicates-from-sorted-array": {
+    "folder": "0026-remove-duplicates-from-sorted-array",
+    "description": "<h2><a href=\"https://leetcode.com/problems/remove-duplicates-from-sorted-array\">26. Remove Duplicates from Sorted Array</a></h2><h3>Easy</h3><hr><p>Given an integer array <code>nums</code> sorted in <strong>non-decreasing order</strong>, remove the duplicates <a href=\"https://en.wikipedia.org/wiki/In-place_algorithm\" target=\"_blank\"><strong>in-place</strong></a> such that each unique element appears only <strong>once</strong>. The <strong>relative order</strong> of the elements should be kept the <strong>same</strong>. Then return <em>the number of unique elements in </em><code>nums</code>.</p>\n\n<p>Consider the number of unique elements of <code>nums</code> to be <code>k</code>, to get accepted, you need to do the following things:</p>\n\n<ul>\n\t<li>Change the array <code>nums</code> such that the first <code>k</code> elements of <code>nums</code> contain the unique elements in the order they were present in <code>nums</code> initially. The remaining elements of <code>nums</code> are not important as well as the size of <code>nums</code>.</li>\n\t<li>Return <code>k</code>.</li>\n</ul>\n\n<p><strong>Custom Judge:</strong></p>\n\n<p>The judge will test your solution with the following code:</p>\n\n<pre>\nint[] nums = [...]; // Input array\nint[] expectedNums = [...]; // The expected answer with correct length\n\nint k = removeDuplicates(nums); // Calls your implementation\n\nassert k == expectedNums.length;\nfor (int i = 0; i &lt; k; i++) {\n    assert nums[i] == expectedNums[i];\n}\n</pre>\n\n<p>If all assertions pass, then your solution will be <strong>accepted</strong>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [1,1,2]\n<strong>Output:</strong> 2, nums = [1,2,_]\n<strong>Explanation:</strong> Your function should return k = 2, with the first two elements of nums being 1 and 2 respectively.\nIt does not matter what you leave beyond the returned k (hence they are underscores).\n</pre>\n\n<p><strong class=\"example\">Example 2:</stron",
+    "solutions": [
+      {
+        "filename": "0026-remove-duplicates-from-sorted-array.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    fun removeDuplicates(nums: IntArray): Int {\n        var k: Int = 1\n        var target: Int = nums[0]\n        nums.forEach {  num ->\n            if (num != target) {\n                nums[k++] = num\n                target = num\n            }\n        }\n        return k\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0076-minimum-window-substring": {
+    "folder": "0076-minimum-window-substring",
+    "description": "<h2><a href=\"https://leetcode.com/problems/minimum-window-substring\">76. Minimum Window Substring</a></h2><h3>Hard</h3><hr><p>Given two strings <code>s</code> and <code>t</code> of lengths <code>m</code> and <code>n</code> respectively, return <em>the <strong>minimum window</strong></em> <span data-keyword=\"substring-nonempty\"><strong><em>substring</em></strong></span><em> of </em><code>s</code><em> such that every character in </em><code>t</code><em> (<strong>including duplicates</strong>) is included in the window</em>. If there is no such substring, return <em>the empty string </em><code>&quot;&quot;</code>.</p>\n\n<p>The testcases will be generated such that the answer is <strong>unique</strong>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;ADOBECODEBANC&quot;, t = &quot;ABC&quot;\n<strong>Output:</strong> &quot;BANC&quot;\n<strong>Explanation:</strong> The minimum window substring &quot;BANC&quot; includes &#39;A&#39;, &#39;B&#39;, and &#39;C&#39; from string t.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;a&quot;, t = &quot;a&quot;\n<strong>Output:</strong> &quot;a&quot;\n<strong>Explanation:</strong> The entire string s is the minimum window.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;a&quot;, t = &quot;aa&quot;\n<strong>Output:</strong> &quot;&quot;\n<strong>Explanation:</strong> Both &#39;a&#39;s from t must be included in the window.\nSince the largest window of s only has one &#39;a&#39;, return empty string.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>m == s.length</code></li>\n\t<li><code>n == t.length</code></li>\n\t<li><code>1 &lt;= m, n &lt;= 10<sup>5</sup></code></li>\n\t<li><code>s</code> and <code>t</code> consist of uppercase and lowercase English letters.</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong>Follow up:</strong> Could you find an algorithm that runs in <c",
+    "solutions": [
+      {
+        "filename": "0076-minimum-window-substring.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    fun minWindow(s: String, t: String): String {\n                if (s.length < t.length) return \"\"\n\n        val targetMap = mutableMapOf<Char, Int>()\n        val windowMap = mutableMapOf<Char, Int>()\n\n        // Step 1: Count characters in `t`\n        for (char in t) {\n            targetMap[char] = targetMap.getOrDefault(char, 0) + 1\n        }\n\n        var left = 0\n        var right = 0\n        var formed = 0  // Number of characters in `windowMap` that meet the `targetMap` requirement\n        var minLength = Int.MAX_VALUE\n        var minLeft = 0\n\n        while (right < s.length) {\n            val charRight = s[right]\n            windowMap[charRight] = windowMap.getOrDefault(charRight, 0) + 1\n\n            // If the current character matches the count in targetMap, increment formed\n            if (targetMap.containsKey(charRight) && windowMap[charRight] == targetMap[charRight]) {\n                formed++\n            }\n\n            // Try to shrink the window from the left\n            while (formed == targetMap.size) {\n                // Update the minimum window\n                if (right - left + 1 < minLength) {\n                    minLength = right - left + 1\n                    minLeft = left\n                }\n\n                val charLeft = s[left]\n                windowMap[charLeft] = windowMap[charLeft]!! - 1\n\n                // If removing `charLeft` makes the window invalid, decrease `formed`\n                if (targetMap.containsKey(charLeft) && windowMap[charLeft]!! < targetMap[charLeft]!!) {\n                    formed--\n                }\n\n                left++\n            }\n\n            right++\n        }\n\n        return if (minLength == Int.MAX_VALUE) \"\" else s.substring(minLeft, minLeft + minLength)\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0104-maximum-depth-of-binary-tree": {
+    "folder": "0104-maximum-depth-of-binary-tree",
+    "description": "<h2><a href=\"https://leetcode.com/problems/maximum-depth-of-binary-tree\">104. Maximum Depth of Binary Tree</a></h2><h3>Easy</h3><hr><p>Given the <code>root</code> of a binary tree, return <em>its maximum depth</em>.</p>\n\n<p>A binary tree&#39;s <strong>maximum depth</strong>&nbsp;is the number of nodes along the longest path from the root node down to the farthest leaf node.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/11/26/tmp-tree.jpg\" style=\"width: 400px; height: 277px;\" />\n<pre>\n<strong>Input:</strong> root = [3,9,20,null,null,15,7]\n<strong>Output:</strong> 3\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> root = [1,null,2]\n<strong>Output:</strong> 2\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in the tree is in the range <code>[0, 10<sup>4</sup>]</code>.</li>\n\t<li><code>-100 &lt;= Node.val &lt;= 100</code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0104-maximum-depth-of-binary-tree.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "/**\n * Example:\n * var ti = TreeNode(5)\n * var v = ti.`val`\n * Definition for a binary tree node.\n * class TreeNode(var `val`: Int) {\n *     var left: TreeNode? = null\n *     var right: TreeNode? = null\n * }\n */\nclass Solution {\n    fun maxDepth(root: TreeNode?): Int {\n        // 끝까지 파다가 없으면 돌아가야되는데, 돌아 갈 때  TreeNode는 자식 노드 정보만 있는데 부모로 어떻게 돌아가지 ? 그것도 단순히 한번 돌아가는게 아닌, 탐색할 노드가 있을 때까지 돌아가야됨. -> 재귀 사용!\n        return findMaxDepth(root, 1)\n    }\n\n    fun findMaxDepth(root: TreeNode?, depth: Int): Int {\n        var maxDepth = depth\n        if ((root?.left == null) && (root?.right == null))  return if (root == null) 0 else maxDepth\n        root?.right?.let {\n            maxDepth = max(maxDepth, findMaxDepth(it, depth + 1))\n        }        \n\n        root?.left?.let {\n            maxDepth = max(maxDepth, findMaxDepth(it, depth + 1))\n        }\n\n        // println(\"value and depth : ${root.`val`}, $maxDepth\")\n        return maxDepth\n    }\n}\n\n/**\n* 시간복잡도 : O(n) \n* n -> node의 갯수 (노드의 갯수만큼 탐색하므로)\n* 공간복잡도 : O(h)\n* h -> 트리의 높이 (최대 트리의 높이만큼 재귀 호출 스택이 쌓이므로)\n* 문제 포인트 :\n* 베스트 답안 : \n**/\n",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0141-linked-list-cycle": {
+    "folder": "0141-linked-list-cycle",
+    "description": "<h2><a href=\"https://leetcode.com/problems/linked-list-cycle\">141. Linked List Cycle</a></h2><h3>Easy</h3><hr><p>Given <code>head</code>, the head of a linked list, determine if the linked list has a cycle in it.</p>\n\n<p>There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the&nbsp;<code>next</code>&nbsp;pointer. Internally, <code>pos</code>&nbsp;is used to denote the index of the node that&nbsp;tail&#39;s&nbsp;<code>next</code>&nbsp;pointer is connected to.&nbsp;<strong>Note that&nbsp;<code>pos</code>&nbsp;is not passed as a parameter</strong>.</p>\n\n<p>Return&nbsp;<code>true</code><em> if there is a cycle in the linked list</em>. Otherwise, return <code>false</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist.png\" style=\"width: 300px; height: 97px; margin-top: 8px; margin-bottom: 8px;\" />\n<pre>\n<strong>Input:</strong> head = [3,2,0,-4], pos = 1\n<strong>Output:</strong> true\n<strong>Explanation:</strong> There is a cycle in the linked list, where the tail connects to the 1st node (0-indexed).\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist_test2.png\" style=\"width: 141px; height: 74px;\" />\n<pre>\n<strong>Input:</strong> head = [1,2], pos = 0\n<strong>Output:</strong> true\n<strong>Explanation:</strong> There is a cycle in the linked list, where the tail connects to the 0th node.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist_test3.png\" style=\"width: 45px; height: 45px;\" />\n<pre>\n<strong>Input:</strong> head = [1], pos = -1\n<strong>Output:</strong> false\n<strong>Explanation:</strong> There is no cycle in the linked list.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of the node",
+    "solutions": [
+      {
+        "filename": "0141-linked-list-cycle.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "/**\n * Example:\n * var li = ListNode(5)\n * var v = li.`val`\n * Definition for singly-linked list.\n * class ListNode(var `val`: Int) {\n *     var next: ListNode? = null\n * }\n */\n\nclass Solution {\n    fun hasCycle(head: ListNode?): Boolean {\n        // current.`val` :  노드 값.\n        // current.next : 다음 노드 객체.\n        var slowPoint = head\n        var fastPoint = head?.next\n    \n        while (fastPoint != null) {\n            if (slowPoint == fastPoint) return true\n            slowPoint = slowPoint?.next\n            fastPoint = fastPoint?.next?.next\n        }\n        return false\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0151-reverse-words-in-a-string": {
+    "folder": "0151-reverse-words-in-a-string",
+    "description": "<h2><a href=\"https://leetcode.com/problems/reverse-words-in-a-string\">151. Reverse Words in a String</a></h2><h3>Medium</h3><hr><p>Given an input string <code>s</code>, reverse the order of the <strong>words</strong>.</p>\n\n<p>A <strong>word</strong> is defined as a sequence of non-space characters. The <strong>words</strong> in <code>s</code> will be separated by at least one space.</p>\n\n<p>Return <em>a string of the words in reverse order concatenated by a single space.</em></p>\n\n<p><b>Note</b> that <code>s</code> may contain leading or trailing spaces or multiple spaces between two words. The returned string should only have a single space separating the words. Do not include any extra spaces.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;the sky is blue&quot;\n<strong>Output:</strong> &quot;blue is sky the&quot;\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;  hello world  &quot;\n<strong>Output:</strong> &quot;world hello&quot;\n<strong>Explanation:</strong> Your reversed string should not contain leading or trailing spaces.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;a good   example&quot;\n<strong>Output:</strong> &quot;example good a&quot;\n<strong>Explanation:</strong> You need to reduce multiple spaces between two words to a single space in the reversed string.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= s.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>s</code> contains English letters (upper-case and lower-case), digits, and spaces <code>&#39; &#39;</code>.</li>\n\t<li>There is <strong>at least one</strong> word in <code>s</code>.</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><b data-stringify-type=\"bold\">Follow-up:&nbsp;</b>If the string data type is mutable in your language, can&nbsp;you solve it&nbsp;<b data-stringify-type=\"bold\">in-place</b>&nbsp;with&nbsp;<code",
+    "solutions": [
+      {
+        "filename": "0151-reverse-words-in-a-string.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def reverseWords(self, s: str) -> str:\n        s_list = s.split()\n        reversed_list = s_list[::-1]\n        return ' '.join(reversed_list)\n        ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0167-two-sum-ii-input-array-is-sorted": {
+    "folder": "0167-two-sum-ii-input-array-is-sorted",
+    "description": "<h2><a href=\"https://leetcode.com/problems/two-sum-ii-input-array-is-sorted\">167. Two Sum II - Input Array Is Sorted</a></h2><h3>Medium</h3><hr><p>Given a <strong>1-indexed</strong> array of integers <code>numbers</code> that is already <strong><em>sorted in non-decreasing order</em></strong>, find two numbers such that they add up to a specific <code>target</code> number. Let these two numbers be <code>numbers[index<sub>1</sub>]</code> and <code>numbers[index<sub>2</sub>]</code> where <code>1 &lt;= index<sub>1</sub> &lt; index<sub>2</sub> &lt;= numbers.length</code>.</p>\n\n<p>Return<em> the indices of the two numbers, </em><code>index<sub>1</sub></code><em> and </em><code>index<sub>2</sub></code><em>, <strong>added by one</strong> as an integer array </em><code>[index<sub>1</sub>, index<sub>2</sub>]</code><em> of length 2.</em></p>\n\n<p>The tests are generated such that there is <strong>exactly one solution</strong>. You <strong>may not</strong> use the same element twice.</p>\n\n<p>Your solution must use only constant extra space.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> numbers = [<u>2</u>,<u>7</u>,11,15], target = 9\n<strong>Output:</strong> [1,2]\n<strong>Explanation:</strong> The sum of 2 and 7 is 9. Therefore, index<sub>1</sub> = 1, index<sub>2</sub> = 2. We return [1, 2].\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> numbers = [<u>2</u>,3,<u>4</u>], target = 6\n<strong>Output:</strong> [1,3]\n<strong>Explanation:</strong> The sum of 2 and 4 is 6. Therefore index<sub>1</sub> = 1, index<sub>2</sub> = 3. We return [1, 3].\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> numbers = [<u>-1</u>,<u>0</u>], target = -1\n<strong>Output:</strong> [1,2]\n<strong>Explanation:</strong> The sum of -1 and 0 is -1. Therefore index<sub>1</sub> = 1, index<sub>2</sub> = 2. We return [1, 2].\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong><",
+    "solutions": [
+      {
+        "filename": "0167-two-sum-ii-input-array-is-sorted.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    fun twoSum(numbers: IntArray, target: Int): IntArray {\n        var left = 0\n        var right = numbers.size-1\n\n        while (true) {\n            if (numbers[left]+numbers[right] > target) right -= 1\n            else if (numbers[left]+numbers[right] < target ) left +=1\n            else break\n        }\n\n        return intArrayOf(left+1, right+1)\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0238-product-of-array-except-self": {
+    "folder": "0238-product-of-array-except-self",
+    "description": "<h2><a href=\"https://leetcode.com/problems/product-of-array-except-self\">238. Product of Array Except Self</a></h2><h3>Medium</h3><hr><p>Given an integer array <code>nums</code>, return <em>an array</em> <code>answer</code> <em>such that</em> <code>answer[i]</code> <em>is equal to the product of all the elements of</em> <code>nums</code> <em>except</em> <code>nums[i]</code>.</p>\n\n<p>The product of any prefix or suffix of <code>nums</code> is <strong>guaranteed</strong> to fit in a <strong>32-bit</strong> integer.</p>\n\n<p>You must write an algorithm that runs in&nbsp;<code>O(n)</code>&nbsp;time and without using the division operation.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<pre><strong>Input:</strong> nums = [1,2,3,4]\n<strong>Output:</strong> [24,12,8,6]\n</pre><p><strong class=\"example\">Example 2:</strong></p>\n<pre><strong>Input:</strong> nums = [-1,1,0,-3,3]\n<strong>Output:</strong> [0,0,9,0,0]\n</pre>\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>2 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>\n\t<li><code>-30 &lt;= nums[i] &lt;= 30</code></li>\n\t<li>The input is generated such that <code>answer[i]</code> is <strong>guaranteed</strong> to fit in a <strong>32-bit</strong> integer.</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong>Follow up:</strong>&nbsp;Can you solve the problem in <code>O(1)</code>&nbsp;extra&nbsp;space complexity? (The output array <strong>does not</strong> count as extra space for space complexity analysis.)</p>\n",
+    "solutions": [
+      {
+        "filename": "0238-product-of-array-except-self.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def productExceptSelf(self, nums: List[int]) -> List[int]:\n        n = len(nums)\n        answer = [1] * n \n\n        pre = 1\n        for i in range(n):\n            answer[i] = pre\n            pre *= nums[i]\n        \n        suf = 1\n        for i in range(n - 1, -1, -1):\n            answer[i] *= suf\n            suf *= nums[i]\n        \n        return answer",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0283-move-zeroes": {
+    "folder": "0283-move-zeroes",
+    "description": "<h2><a href=\"https://leetcode.com/problems/move-zeroes\">283. Move Zeroes</a></h2><h3>Easy</h3><hr><p>Given an integer array <code>nums</code>, move all <code>0</code>&#39;s to the end of it while maintaining the relative order of the non-zero elements.</p>\n\n<p><strong>Note</strong> that you must do this in-place without making a copy of the array.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<pre><strong>Input:</strong> nums = [0,1,0,3,12]\n<strong>Output:</strong> [1,3,12,0,0]\n</pre><p><strong class=\"example\">Example 2:</strong></p>\n<pre><strong>Input:</strong> nums = [0]\n<strong>Output:</strong> [0]\n</pre>\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>-2<sup>31</sup> &lt;= nums[i] &lt;= 2<sup>31</sup> - 1</code></li>\n</ul>\n\n<p>&nbsp;</p>\n<strong>Follow up:</strong> Could you minimize the total number of operations done?",
+    "solutions": [
+      {
+        "filename": "0283-move-zeroes.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def moveZeroes(self, nums: List[int]) -> None:\n        \"\"\"\n        Do not return anything, modify nums in-place instead.\n        \"\"\"\n\n        first_point = 0\n        second_point = 0\n        while True:\n            if nums[first_point] != 0:\n                nums[second_point] = nums[first_point]\n                second_point +=1\n                first_point +=1\n            else:\n                first_point += 1\n            \n            if (first_point == len(nums)):\n                while True:\n                    if second_point == len(nums): break\n                    nums[second_point] = 0\n                    second_point += 1\n                break\n        \n            \n\"\"\"\n시간 복잡도 : O(n)\n공간 복잡도 : O(1)\n문제 포인트 : 투포인트\n베스트 풀이 : \n\"\"\"\n\n        \n",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0303-range-sum-query-immutable": {
+    "folder": "0303-range-sum-query-immutable",
+    "description": "<h2><a href=\"https://leetcode.com/problems/range-sum-query-immutable\">303. Range Sum Query - Immutable</a></h2><h3>Easy</h3><hr><p>Given an integer array <code>nums</code>, handle multiple queries of the following type:</p>\n\n<ol>\n\t<li>Calculate the <strong>sum</strong> of the elements of <code>nums</code> between indices <code>left</code> and <code>right</code> <strong>inclusive</strong> where <code>left &lt;= right</code>.</li>\n</ol>\n\n<p>Implement the <code>NumArray</code> class:</p>\n\n<ul>\n\t<li><code>NumArray(int[] nums)</code> Initializes the object with the integer array <code>nums</code>.</li>\n\t<li><code>int sumRange(int left, int right)</code> Returns the <strong>sum</strong> of the elements of <code>nums</code> between indices <code>left</code> and <code>right</code> <strong>inclusive</strong> (i.e. <code>nums[left] + nums[left + 1] + ... + nums[right]</code>).</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input</strong>\n[&quot;NumArray&quot;, &quot;sumRange&quot;, &quot;sumRange&quot;, &quot;sumRange&quot;]\n[[[-2, 0, 3, -5, 2, -1]], [0, 2], [2, 5], [0, 5]]\n<strong>Output</strong>\n[null, 1, -1, -3]\n\n<strong>Explanation</strong>\nNumArray numArray = new NumArray([-2, 0, 3, -5, 2, -1]);\nnumArray.sumRange(0, 2); // return (-2) + 0 + 3 = 1\nnumArray.sumRange(2, 5); // return 3 + (-5) + 2 + (-1) = -1\nnumArray.sumRange(0, 5); // return (-2) + 0 + 3 + (-5) + 2 + (-1) = -3\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>-10<sup>5</sup> &lt;= nums[i] &lt;= 10<sup>5</sup></code></li>\n\t<li><code>0 &lt;= left &lt;= right &lt; nums.length</code></li>\n\t<li>At most <code>10<sup>4</sup></code> calls will be made to <code>sumRange</code>.</li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0303-range-sum-query-immutable.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class NumArray(private val nums: IntArray) {\n    /*\n    Data structure : array\n    algo : \n    ps : Prefix Sum\n    references - https://medium.com/algomaster-io/leetcode-was-hard-until-i-learned-these-15-patterns-19d15f6d71f1\n     */\n\n    fun sumRange(left: Int, right: Int): Int {\n        var answer = 0\n        for (i: Int in left..right) {\n            answer += this.nums[i]\n        }\n        return answer\n    } \n}\n\n/**\n * Your NumArray object will be instantiated and called as such:\n * var obj = NumArray(nums)\n * var param_1 = obj.sumRange(left,right)\n */",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0328-odd-even-linked-list": {
+    "folder": "0328-odd-even-linked-list",
+    "description": "<h2><a href=\"https://leetcode.com/problems/odd-even-linked-list\">328. Odd Even Linked List</a></h2><h3>Medium</h3><hr><p>Given the <code>head</code> of a singly linked list, group all the nodes with odd indices together followed by the nodes with even indices, and return <em>the reordered list</em>.</p>\n\n<p>The <strong>first</strong> node is considered <strong>odd</strong>, and the <strong>second</strong> node is <strong>even</strong>, and so on.</p>\n\n<p>Note that the relative order inside both the even and odd groups should remain as it was in the input.</p>\n\n<p>You must solve the problem&nbsp;in <code>O(1)</code>&nbsp;extra space complexity and <code>O(n)</code> time complexity.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/03/10/oddeven-linked-list.jpg\" style=\"width: 300px; height: 123px;\" />\n<pre>\n<strong>Input:</strong> head = [1,2,3,4,5]\n<strong>Output:</strong> [1,3,5,2,4]\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/03/10/oddeven2-linked-list.jpg\" style=\"width: 500px; height: 142px;\" />\n<pre>\n<strong>Input:</strong> head = [2,1,3,5,6,4,7]\n<strong>Output:</strong> [2,3,6,7,1,5,4]\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in the linked list is in the range <code>[0, 10<sup>4</sup>]</code>.</li>\n\t<li><code>-10<sup>6</sup> &lt;= Node.val &lt;= 10<sup>6</sup></code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0328-odd-even-linked-list.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "/**\n * Example:\n * var li = ListNode(5)\n * var v = li.`val`\n * Definition for singly-linked list.\n * class ListNode(var `val`: Int) {\n *     var next: ListNode? = null\n * }\n */\nclass Solution {\n\n    data class TailInfo(\n    val tail: ListNode?, \n    val length: Int\n    )\n\n    \n    fun oddEvenList(head: ListNode?): ListNode? {\n        var idx = 1\n        var (tail, length) = _findTail(head)\n        var beforeTarget = head\n        var target: ListNode? = head?.next\n\n    \n        while(true) {\n            if ((target?.next == null) or (idx == length)) break\n\n            // beforeTarget보다 앞서있는 target 혹은 target.next가 Null이면 다음 로직을 타지 않으므로 beforeTarget과 target은 null이 아님을 강제함.(!!)\n            if (idx%2 == 1 ) {\n                beforeTarget!!.next = target!!.next\n                target.next = null\n                tail!!.next = target\n                \n                tail = target\n                target = beforeTarget.next\n                idx++\n            } else {\n                target = target!!.next\n                beforeTarget = beforeTarget!!.next\n                idx++\n            }\n        }\n\n        return head\n    }\n\n    private fun _findTail(head: ListNode?): TailInfo {\n        var current = head\n        var length = 1\n\n        while(true) {\n            if(current?.next == null) break\n            current = current.next\n            length++\n        }\n    return TailInfo(current, length)\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0334-increasing-triplet-subsequence": {
+    "folder": "0334-increasing-triplet-subsequence",
+    "description": "<h2><a href=\"https://leetcode.com/problems/increasing-triplet-subsequence\">334. Increasing Triplet Subsequence</a></h2><h3>Medium</h3><hr><p>Given an integer array <code>nums</code>, return <code>true</code><em> if there exists a triple of indices </em><code>(i, j, k)</code><em> such that </em><code>i &lt; j &lt; k</code><em> and </em><code>nums[i] &lt; nums[j] &lt; nums[k]</code>. If no such indices exists, return <code>false</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [1,2,3,4,5]\n<strong>Output:</strong> true\n<strong>Explanation:</strong> Any triplet where i &lt; j &lt; k is valid.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [5,4,3,2,1]\n<strong>Output:</strong> false\n<strong>Explanation:</strong> No triplet exists.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [2,1,5,0,4,6]\n<strong>Output:</strong> true\n<strong>Explanation:</strong> The triplet (3, 4, 5) is valid because nums[3] == 0 &lt; nums[4] == 4 &lt; nums[5] == 6.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 5 * 10<sup>5</sup></code></li>\n\t<li><code>-2<sup>31</sup> &lt;= nums[i] &lt;= 2<sup>31</sup> - 1</code></li>\n</ul>\n\n<p>&nbsp;</p>\n<strong>Follow up:</strong> Could you implement a solution that runs in <code>O(n)</code> time complexity and <code>O(1)</code> space complexity?",
+    "solutions": [
+      {
+        "filename": "0334-increasing-triplet-subsequence.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def increasingTriplet(self, nums: List[int]) -> bool:\n        first = float('inf')\n        second = float('inf')\n\n        for n in nums:\n            if n <= first:\n                first = n\n            elif n <= second:\n                second = n\n            else:\n                return True\n\n        return False  \n        ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0345-reverse-vowels-of-a-string": {
+    "folder": "0345-reverse-vowels-of-a-string",
+    "description": "<h2><a href=\"https://leetcode.com/problems/reverse-vowels-of-a-string\">345. Reverse Vowels of a String</a></h2><h3>Easy</h3><hr><p>Given a string <code>s</code>, reverse only all the vowels in the string and return it.</p>\n\n<p>The vowels are <code>&#39;a&#39;</code>, <code>&#39;e&#39;</code>, <code>&#39;i&#39;</code>, <code>&#39;o&#39;</code>, and <code>&#39;u&#39;</code>, and they can appear in both lower and upper cases, more than once.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">s = &quot;IceCreAm&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">&quot;AceCreIm&quot;</span></p>\n\n<p><strong>Explanation:</strong></p>\n\n<p>The vowels in <code>s</code> are <code>[&#39;I&#39;, &#39;e&#39;, &#39;e&#39;, &#39;A&#39;]</code>. On reversing the vowels, s becomes <code>&quot;AceCreIm&quot;</code>.</p>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">s = &quot;leetcode&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">&quot;leotcede&quot;</span></p>\n</div>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= s.length &lt;= 3 * 10<sup>5</sup></code></li>\n\t<li><code>s</code> consist of <strong>printable ASCII</strong> characters.</li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0345-reverse-vowels-of-a-string.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def reverseVowels(self, s: str) -> str:\n        s_list = list(s)\n        vowelIdx = []\n        for idx, value in enumerate(s):\n            if (self.isVowel(value)): vowelIdx.append(idx)\n        print(vowelIdx)\n        for idx, value in enumerate(vowelIdx):\n            if(idx+1 > len(vowelIdx)/2): break\n            target = s[value]\n            reverseIdx = len(vowelIdx)-1-idx\n            reverseTarget = s[vowelIdx[reverseIdx]]\n            s_list[value] =reverseTarget\n            s_list[vowelIdx[reverseIdx]] = target\n        return ''.join(s_list)\n    def isVowel(self, value: str) -> bool:\n        vowels = [ 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U']\n        return value in vowels\n        ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0443-string-compression": {
+    "folder": "0443-string-compression",
+    "description": "<h2><a href=\"https://leetcode.com/problems/string-compression\">443. String Compression</a></h2><h3>Medium</h3><hr><p>Given an array of characters <code>chars</code>, compress it using the following algorithm:</p>\n\n<p>Begin with an empty string <code>s</code>. For each group of <strong>consecutive repeating characters</strong> in <code>chars</code>:</p>\n\n<ul>\n\t<li>If the group&#39;s length is <code>1</code>, append the character to <code>s</code>.</li>\n\t<li>Otherwise, append the character followed by the group&#39;s length.</li>\n</ul>\n\n<p>The compressed string <code>s</code> <strong>should not be returned separately</strong>, but instead, be stored <strong>in the input character array <code>chars</code></strong>. Note that group lengths that are <code>10</code> or longer will be split into multiple characters in <code>chars</code>.</p>\n\n<p>After you are done <strong>modifying the input array,</strong> return <em>the new length of the array</em>.</p>\n\n<p>You must write an algorithm that uses only constant extra space.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> chars = [&quot;a&quot;,&quot;a&quot;,&quot;b&quot;,&quot;b&quot;,&quot;c&quot;,&quot;c&quot;,&quot;c&quot;]\n<strong>Output:</strong> Return 6, and the first 6 characters of the input array should be: [&quot;a&quot;,&quot;2&quot;,&quot;b&quot;,&quot;2&quot;,&quot;c&quot;,&quot;3&quot;]\n<strong>Explanation:</strong> The groups are &quot;aa&quot;, &quot;bb&quot;, and &quot;ccc&quot;. This compresses to &quot;a2b2c3&quot;.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> chars = [&quot;a&quot;]\n<strong>Output:</strong> Return 1, and the first character of the input array should be: [&quot;a&quot;]\n<strong>Explanation:</strong> The only group is &quot;a&quot;, which remains uncompressed since it&#39;s a single character.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> chars = [&",
+    "solutions": [
+      {
+        "filename": "0443-string-compression.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "from typing import List\n\nclass Solution:\n    def compress(self, chars: List[str]) -> int:\n        write = 0  \n        left = 0 \n\n        for right in range(len(chars)):\n            if right == len(chars) - 1 or chars[right] != chars[right + 1]:\n                chars[write] = chars[left]\n                write += 1\n\n                group_length = right - left + 1 \n\n                if group_length > 1:\n                    for digit in str(group_length):\n                        chars[write] = digit\n                        write += 1\n\n                left = right + 1\n\n        return write",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0525-contiguous-array": {
+    "folder": "0525-contiguous-array",
+    "description": "<h2><a href=\"https://leetcode.com/problems/contiguous-array\">525. Contiguous Array</a></h2><h3>Medium</h3><hr><p>Given a binary array <code>nums</code>, return <em>the maximum length of a contiguous subarray with an equal number of </em><code>0</code><em> and </em><code>1</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [0,1]\n<strong>Output:</strong> 2\n<strong>Explanation:</strong> [0, 1] is the longest contiguous subarray with an equal number of 0 and 1.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [0,1,0]\n<strong>Output:</strong> 2\n<strong>Explanation:</strong> [0, 1] (or [1, 0]) is a longest contiguous subarray with equal number of 0 and 1.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>\n\t<li><code>nums[i]</code> is either <code>0</code> or <code>1</code>.</li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0525-contiguous-array.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    /*\n    data structure: array, hashMap\n    algorithm: \n    ps: prefix sum (누적 합)\n     */\n        fun findMaxLength(nums: IntArray): Int {\n        val prefixSumIntArray = IntArray(nums.size)\n        val hashMap= hashMapOf<Int, Int>()\n        var answer: Int = 0\n\n        nums.map { if (it == 0) -1 else it }\n        .foldIndexed(0) { idx, acc, it -> \n        val sum = acc + it\n        prefixSumIntArray.set(idx, sum)\n        sum  \n        }\n        \n        // println(prefixSumIntArray.contentToString())\n\n        prefixSumIntArray.forEachIndexed { idx, it ->\n            val prefixSum = prefixSumIntArray.get(idx)\n            val samePrefixSumSmallIdx = hashMap.get(prefixSum)\n\n            if (prefixSum == 0) answer = maxOf(answer, idx+1)\n            if (samePrefixSumSmallIdx != null)\n                answer = maxOf(answer, idx-(samePrefixSumSmallIdx))\n            else hashMap.put(prefixSum, idx)\n        }\n\n        return answer\n    }\n}\n",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0547-number-of-provinces": {
+    "folder": "0547-number-of-provinces",
+    "description": "<h2><a href=\"https://leetcode.com/problems/number-of-provinces\">547. Number of Provinces</a></h2><h3>Medium</h3><hr><p>There are <code>n</code> cities. Some of them are connected, while some are not. If city <code>a</code> is connected directly with city <code>b</code>, and city <code>b</code> is connected directly with city <code>c</code>, then city <code>a</code> is connected indirectly with city <code>c</code>.</p>\n\n<p>A <strong>province</strong> is a group of directly or indirectly connected cities and no other cities outside of the group.</p>\n\n<p>You are given an <code>n x n</code> matrix <code>isConnected</code> where <code>isConnected[i][j] = 1</code> if the <code>i<sup>th</sup></code> city and the <code>j<sup>th</sup></code> city are directly connected, and <code>isConnected[i][j] = 0</code> otherwise.</p>\n\n<p>Return <em>the total number of <strong>provinces</strong></em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/12/24/graph1.jpg\" style=\"width: 222px; height: 142px;\" />\n<pre>\n<strong>Input:</strong> isConnected = [[1,1,0],[1,1,0],[0,0,1]]\n<strong>Output:</strong> 2\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/12/24/graph2.jpg\" style=\"width: 222px; height: 142px;\" />\n<pre>\n<strong>Input:</strong> isConnected = [[1,0,0],[0,1,0],[0,0,1]]\n<strong>Output:</strong> 3\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= n &lt;= 200</code></li>\n\t<li><code>n == isConnected.length</code></li>\n\t<li><code>n == isConnected[i].length</code></li>\n\t<li><code>isConnected[i][j]</code> is <code>1</code> or <code>0</code>.</li>\n\t<li><code>isConnected[i][i] == 1</code></li>\n\t<li><code>isConnected[i][j] == isConnected[j][i]</code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0547-number-of-provinces.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def findCircleNum(self, isConnected: List[List[int]]) -> int:\n        n = len(isConnected)\n        answer = 1\n        visited = [False] * n\n        stack = [0]\n        while stack or not all(visited):\n            if(not stack): \n                answer+=1\n                stack.append(visited.index(False))\n            cur = stack.pop()\n            if visited[cur]:\n                continue\n            visited[cur] = True\n            for nxt in range(0, n):\n                if isConnected[cur][nxt] and not visited[nxt]:\n                    stack.append(nxt)\n        \n        return answer\n        ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0605-can-place-flowers": {
+    "folder": "0605-can-place-flowers",
+    "description": "<h2><a href=\"https://leetcode.com/problems/can-place-flowers\">605. Can Place Flowers</a></h2><h3>Easy</h3><hr><p>You have a long flowerbed in which some of the plots are planted, and some are not. However, flowers cannot be planted in <strong>adjacent</strong> plots.</p>\n\n<p>Given an integer array <code>flowerbed</code> containing <code>0</code>&#39;s and <code>1</code>&#39;s, where <code>0</code> means empty and <code>1</code> means not empty, and an integer <code>n</code>, return <code>true</code>&nbsp;<em>if</em> <code>n</code> <em>new flowers can be planted in the</em> <code>flowerbed</code> <em>without violating the no-adjacent-flowers rule and</em> <code>false</code> <em>otherwise</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<pre><strong>Input:</strong> flowerbed = [1,0,0,0,1], n = 1\n<strong>Output:</strong> true\n</pre><p><strong class=\"example\">Example 2:</strong></p>\n<pre><strong>Input:</strong> flowerbed = [1,0,0,0,1], n = 2\n<strong>Output:</strong> false\n</pre>\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= flowerbed.length &lt;= 2 * 10<sup>4</sup></code></li>\n\t<li><code>flowerbed[i]</code> is <code>0</code> or <code>1</code>.</li>\n\t<li>There are no two adjacent flowers in <code>flowerbed</code>.</li>\n\t<li><code>0 &lt;= n &lt;= flowerbed.length</code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0605-can-place-flowers.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def canPlaceFlowers(self, flowerbed: List[int], n: int) -> bool:\n        canPlantCount = 0\n        for idx, item in enumerate(flowerbed):\n            if (self.canPlanted(idx, flowerbed)): \n                canPlantCount += 1\n                flowerbed[idx] = 1\n        if (canPlantCount >= n): return True\n        return False\n    \n    def canPlanted(self, idx: int, flowerbed: List[int]) -> bool:\n        if (idx == 0):\n            if (len(flowerbed) == 1 and flowerbed[idx] == 0): return True \n            if (flowerbed[idx] == 0 and flowerbed[idx+1] == 0): return True\n        elif (0 < idx and idx < len(flowerbed)-1):\n            if (flowerbed[idx] == 0 and flowerbed[idx-1] == 0 and flowerbed[idx+1] == 0): return True\n        elif (idx == len(flowerbed)-1):\n            if (flowerbed[idx] == 0 and flowerbed[idx-1] == 0): return True\n        return False\n        ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0643-maximum-average-subarray-i": {
+    "folder": "0643-maximum-average-subarray-i",
+    "description": "<h2><a href=\"https://leetcode.com/problems/maximum-average-subarray-i\">643. Maximum Average Subarray I</a></h2><h3>Easy</h3><hr><p>You are given an integer array <code>nums</code> consisting of <code>n</code> elements, and an integer <code>k</code>.</p>\n\n<p>Find a contiguous subarray whose <strong>length is equal to</strong> <code>k</code> that has the maximum average value and return <em>this value</em>. Any answer with a calculation error less than <code>10<sup>-5</sup></code> will be accepted.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [1,12,-5,-6,50,3], k = 4\n<strong>Output:</strong> 12.75000\n<strong>Explanation:</strong> Maximum average is (12 - 5 - 6 + 50) / 4 = 51 / 4 = 12.75\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [5], k = 1\n<strong>Output:</strong> 5.00000\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>n == nums.length</code></li>\n\t<li><code>1 &lt;= k &lt;= n &lt;= 10<sup>5</sup></code></li>\n\t<li><code>-10<sup>4</sup> &lt;= nums[i] &lt;= 10<sup>4</sup></code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0643-maximum-average-subarray-i.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    fun findMaxAverage(nums: IntArray, k: Int): Double {\n        /**\n        * data structure : array.\n        * algorithm : search.\n        * problem solving : slide window.\n         */\n\n        if (nums.size < k) return -1.0\n        var sum = 0.0\n        var max = 0.0\n        var idx = k-1\n\n        nums.forEachIndexed { index, it -> \n            if (index < k-1) {\n                sum += it\n            } else if (index == k-1) {\n                sum += it\n                max = sum.toDouble() / k\n            } else {\n                sum += it\n                sum -= nums[index-k]\n                max = kotlin.math.max(max, sum.toDouble() /k)\n            }\n        }\n        return max\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0649-dota2-senate": {
+    "folder": "0649-dota2-senate",
+    "description": "<h2><a href=\"https://leetcode.com/problems/dota2-senate\">649. Dota2 Senate</a></h2><h3>Medium</h3><hr><p>In the world of Dota2, there are two parties: the Radiant and the Dire.</p>\n\n<p>The Dota2 senate consists of senators coming from two parties. Now the Senate wants to decide on a change in the Dota2 game. The voting for this change is a round-based procedure. In each round, each senator can exercise <strong>one</strong> of the two rights:</p>\n\n<ul>\n\t<li><strong>Ban one senator&#39;s right:</strong> A senator can make another senator lose all his rights in this and all the following rounds.</li>\n\t<li><strong>Announce the victory:</strong> If this senator found the senators who still have rights to vote are all from the same party, he can announce the victory and decide on the change in the game.</li>\n</ul>\n\n<p>Given a string <code>senate</code> representing each senator&#39;s party belonging. The character <code>&#39;R&#39;</code> and <code>&#39;D&#39;</code> represent the Radiant party and the Dire party. Then if there are <code>n</code> senators, the size of the given string will be <code>n</code>.</p>\n\n<p>The round-based procedure starts from the first senator to the last senator in the given order. This procedure will last until the end of voting. All the senators who have lost their rights will be skipped during the procedure.</p>\n\n<p>Suppose every senator is smart enough and will play the best strategy for his own party. Predict which party will finally announce the victory and change the Dota2 game. The output should be <code>&quot;Radiant&quot;</code> or <code>&quot;Dire&quot;</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> senate = &quot;RD&quot;\n<strong>Output:</strong> &quot;Radiant&quot;\n<strong>Explanation:</strong> \nThe first senator comes from Radiant and he can just ban the next senator&#39;s right in round 1. \nAnd the second senator can&#39;t exercise any rights anymore since his right h",
+    "solutions": [
+      {
+        "filename": "0649-dota2-senate.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def predictPartyVictory(self, senate: str) -> str:\n        n = len(senate)\n        radiant = deque()\n        dire = deque()\n        \n        for i, s in enumerate(senate):\n            if s == 'R':\n                radiant.append(i)\n            else:\n                dire.append(i)\n\n        while radiant and dire:\n            r = radiant.popleft()\n            d = dire.popleft()\n\n            if r < d:\n                radiant.append(r + n)\n            else:\n                dire.append(d + n)\n\n        return \"Radiant\" if radiant else \"Dire\"",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0724-find-pivot-index": {
+    "folder": "0724-find-pivot-index",
+    "description": "<h2><a href=\"https://leetcode.com/problems/find-pivot-index\">724. Find Pivot Index</a></h2><h3>Easy</h3><hr><p>Given an array of integers <code>nums</code>, calculate the <strong>pivot index</strong> of this array.</p>\n\n<p>The <strong>pivot index</strong> is the index where the sum of all the numbers <strong>strictly</strong> to the left of the index is equal to the sum of all the numbers <strong>strictly</strong> to the index&#39;s right.</p>\n\n<p>If the index is on the left edge of the array, then the left sum is <code>0</code> because there are no elements to the left. This also applies to the right edge of the array.</p>\n\n<p>Return <em>the <strong>leftmost pivot index</strong></em>. If no such index exists, return <code>-1</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [1,7,3,6,5,6]\n<strong>Output:</strong> 3\n<strong>Explanation:</strong>\nThe pivot index is 3.\nLeft sum = nums[0] + nums[1] + nums[2] = 1 + 7 + 3 = 11\nRight sum = nums[4] + nums[5] = 5 + 6 = 11\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [1,2,3]\n<strong>Output:</strong> -1\n<strong>Explanation:</strong>\nThere is no index that satisfies the conditions in the problem statement.</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [2,1,-1]\n<strong>Output:</strong> 0\n<strong>Explanation:</strong>\nThe pivot index is 0.\nLeft sum = 0 (no elements to the left of index 0)\nRight sum = nums[1] + nums[2] = 1 + -1 = 0\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>-1000 &lt;= nums[i] &lt;= 1000</code></li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong>Note:</strong> This question is the same as&nbsp;1991:&nbsp;<a href=\"https://leetcode.com/problems/find-the-middle-index-in-array/\" target=\"_blank\">https://leetcode.com/problems/find-the-middle-index-in-array/</a></p>\n",
+    "solutions": [
+      {
+        "filename": "0724-find-pivot-index.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def pivotIndex(self, nums: List[int]) -> int:\n        leftPrefixSum = []\n        rightPrefixSum = []\n        for idx, value in enumerate(nums):\n            if idx == 0 : leftPrefixSum.append(value)\n            else :leftPrefixSum.append(leftPrefixSum[idx-1] + value)\n        for idx, value in enumerate(reversed(nums)):\n            if (idx == 0):\n                rightPrefixSum.append(value)\n            else :\n                rightPrefixSum.append(rightPrefixSum[idx-1] + value)\n            \n        print(f\"left : {leftPrefixSum}\")\n        print(f\"right : {rightPrefixSum}\")\n        for idx, value in enumerate(leftPrefixSum):\n\n            print(leftPrefixSum[idx] == rightPrefixSum[len(nums)-idx-1])\n            if (leftPrefixSum[idx] == rightPrefixSum[len(nums)-idx-1]):\n                return idx\n        return -1",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0735-asteroid-collision": {
+    "folder": "0735-asteroid-collision",
+    "description": "<h2><a href=\"https://leetcode.com/problems/asteroid-collision\">735. Asteroid Collision</a></h2><h3>Medium</h3><hr><p>We are given an array <code>asteroids</code> of integers representing asteroids in a row. The indices of the asteriod in the array represent their relative position in space.</p>\n\n<p>For each asteroid, the absolute value represents its size, and the sign represents its direction (positive meaning right, negative meaning left). Each asteroid moves at the same speed.</p>\n\n<p>Find out the state of the asteroids after all collisions. If two asteroids meet, the smaller one will explode. If both are the same size, both will explode. Two asteroids moving in the same direction will never meet.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> asteroids = [5,10,-5]\n<strong>Output:</strong> [5,10]\n<strong>Explanation:</strong> The 10 and -5 collide resulting in 10. The 5 and 10 never collide.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> asteroids = [8,-8]\n<strong>Output:</strong> []\n<strong>Explanation:</strong> The 8 and -8 collide exploding each other.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> asteroids = [10,2,-5]\n<strong>Output:</strong> [10]\n<strong>Explanation:</strong> The 2 and -5 collide resulting in -5. The 10 and -5 collide resulting in 10.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>2 &lt;= asteroids.length &lt;= 10<sup>4</sup></code></li>\n\t<li><code>-1000 &lt;= asteroids[i] &lt;= 1000</code></li>\n\t<li><code>asteroids[i] != 0</code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0735-asteroid-collision.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def asteroidCollision(self, asteroids: List[int]) -> List[int]:\n        stack = []\n\n        for value in asteroids:\n            if (value >= 0): stack.append(value)\n            else: \n                while True:\n                    if len(stack) == 0: \n                        stack.append(value)\n                        break\n                    value2 = stack.pop()\n                    if value2 < 0:\n                        stack.append(value2)\n                        stack.append(value)\n                        break\n                    elif value2 + value > 0:\n                        stack.append(value2)\n                        break\n                    elif value2 + value == 0:\n                        break\n                    \n                    \n        return stack\n\n\n\n        ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0841-keys-and-rooms": {
+    "folder": "0841-keys-and-rooms",
+    "description": "<h2><a href=\"https://leetcode.com/problems/keys-and-rooms\">841. Keys and Rooms</a></h2><h3>Medium</h3><hr><p>There are <code>n</code> rooms labeled from <code>0</code> to <code>n - 1</code>&nbsp;and all the rooms are locked except for room <code>0</code>. Your goal is to visit all the rooms. However, you cannot enter a locked room without having its key.</p>\n\n<p>When you visit a room, you may find a set of <strong>distinct keys</strong> in it. Each key has a number on it, denoting which room it unlocks, and you can take all of them with you to unlock the other rooms.</p>\n\n<p>Given an array <code>rooms</code> where <code>rooms[i]</code> is the set of keys that you can obtain if you visited room <code>i</code>, return <code>true</code> <em>if you can visit <strong>all</strong> the rooms, or</em> <code>false</code> <em>otherwise</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> rooms = [[1],[2],[3],[]]\n<strong>Output:</strong> true\n<strong>Explanation:</strong> \nWe visit room 0 and pick up key 1.\nWe then visit room 1 and pick up key 2.\nWe then visit room 2 and pick up key 3.\nWe then visit room 3.\nSince we were able to visit every room, we return true.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> rooms = [[1,3],[3,0,1],[2],[0]]\n<strong>Output:</strong> false\n<strong>Explanation:</strong> We can not enter room number 2 since the only key that unlocks it is in that room.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>n == rooms.length</code></li>\n\t<li><code>2 &lt;= n &lt;= 1000</code></li>\n\t<li><code>0 &lt;= rooms[i].length &lt;= 1000</code></li>\n\t<li><code>1 &lt;= sum(rooms[i].length) &lt;= 3000</code></li>\n\t<li><code>0 &lt;= rooms[i][j] &lt; n</code></li>\n\t<li>All the values of <code>rooms[i]</code> are <strong>unique</strong>.</li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0841-keys-and-rooms.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def canVisitAllRooms(self, rooms: List[List[int]]) -> bool:\n        n = len(rooms)\n        visited = [False] * n\n        stack = [0]\n\n        while stack:\n            cur = stack.pop()\n            if (visited[cur]): continue\n            visited[cur] = True\n            for next in rooms[cur]:\n                if (visited[next] != True): stack.append(next)\n\n        for visitedValue in visited:\n            if (visitedValue == False): return False\n        return True\n\n\n        ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0904-leaf-similar-trees": {
+    "folder": "0904-leaf-similar-trees",
+    "description": "<h2><a href=\"https://leetcode.com/problems/leaf-similar-trees\">904. Leaf-Similar Trees</a></h2><h3>Easy</h3><hr><p>Consider all the leaves of a binary tree, from&nbsp;left to right order, the values of those&nbsp;leaves form a <strong>leaf value sequence</strong><em>.</em></p>\n\n<p><img alt=\"\" src=\"https://s3-lc-upload.s3.amazonaws.com/uploads/2018/07/16/tree.png\" style=\"width: 400px; height: 336px;\" /></p>\n\n<p>For example, in the given tree above, the leaf value sequence is <code>(6, 7, 4, 9, 8)</code>.</p>\n\n<p>Two binary trees are considered <em>leaf-similar</em>&nbsp;if their leaf value sequence is the same.</p>\n\n<p>Return <code>true</code> if and only if the two given trees with head nodes <code>root1</code> and <code>root2</code> are leaf-similar.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/09/03/leaf-similar-1.jpg\" style=\"width: 600px; height: 237px;\" />\n<pre>\n<strong>Input:</strong> root1 = [3,5,1,6,2,9,8,null,null,7,4], root2 = [3,5,1,6,7,4,2,null,null,null,null,null,null,9,8]\n<strong>Output:</strong> true\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/09/03/leaf-similar-2.jpg\" style=\"width: 300px; height: 110px;\" />\n<pre>\n<strong>Input:</strong> root1 = [1,2,3], root2 = [1,3,2]\n<strong>Output:</strong> false\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li>The number of nodes in each tree will be in the range <code>[1, 200]</code>.</li>\n\t<li>Both of the given trees will have values in the range <code>[0, 200]</code>.</li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "0904-leaf-similar-trees.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "/**\n * Example:\n * var ti = TreeNode(5)\n * var v = ti.`val`\n * Definition for a binary tree node.\n * class TreeNode(var `val`: Int) {\n *     var left: TreeNode? = null\n *     var right: TreeNode? = null\n * }\n */\nclass Solution {\n    fun leafSimilar(root1: TreeNode?, root2: TreeNode?): Boolean {\n        return _leafValueSequence(root1, mutableListOf<Int>()) == _leafValueSequence(root2, mutableListOf<Int>())\n    }\n    \n    private fun _leafValueSequence(root: TreeNode?, sequence: MutableList<Int>): MutableList<Int> {\n        var seq = sequence\n        if (root == null) return sequence\n        if (root.left == null && root.right == null) {\n            seq.add(root.`val`)\n            return seq\n        }\n        if (root.left != null) seq = _leafValueSequence(root.left, seq)\n        if (root.right != null) seq = _leafValueSequence(root.right, seq)\n\n        return seq \n    }\n}\n\n/**\n* 시간 복잡도 : O(n) (n = n1 + n2, n1 -> 1번트리 노드수, n2 -> 2번트리 노드수)\n* 공간 복잡도 : O(n) (n = h1+h2+l1+l2 , h1 -> 1번트리 높이, h2 -> 2번트리 높이, l1 -> 1번트리 리프노드 저장 리스트 공간, l2 -> 2번트리 리프노드 저장 리스트 공간)\n* 문제 포인트 : \n* 베트스 풀이 :\n**/\n",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "0933-number-of-recent-calls": {
+    "folder": "0933-number-of-recent-calls",
+    "description": "<h2><a href=\"https://leetcode.com/problems/number-of-recent-calls\">933. Number of Recent Calls</a></h2><h3>Easy</h3><hr><p>You have a <code>RecentCounter</code> class which counts the number of recent requests within a certain time frame.</p>\n\n<p>Implement the <code>RecentCounter</code> class:</p>\n\n<ul>\n\t<li><code>RecentCounter()</code> Initializes the counter with zero recent requests.</li>\n\t<li><code>int ping(int t)</code> Adds a new request at time <code>t</code>, where <code>t</code> represents some time in milliseconds, and returns the number of requests that has happened in the past <code>3000</code> milliseconds (including the new request). Specifically, return the number of requests that have happened in the inclusive range <code>[t - 3000, t]</code>.</li>\n</ul>\n\n<p>It is <strong>guaranteed</strong> that every call to <code>ping</code> uses a strictly larger value of <code>t</code> than the previous call.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input</strong>\n[&quot;RecentCounter&quot;, &quot;ping&quot;, &quot;ping&quot;, &quot;ping&quot;, &quot;ping&quot;]\n[[], [1], [100], [3001], [3002]]\n<strong>Output</strong>\n[null, 1, 2, 3, 3]\n\n<strong>Explanation</strong>\nRecentCounter recentCounter = new RecentCounter();\nrecentCounter.ping(1);     // requests = [<u>1</u>], range is [-2999,1], return 1\nrecentCounter.ping(100);   // requests = [<u>1</u>, <u>100</u>], range is [-2900,100], return 2\nrecentCounter.ping(3001);  // requests = [<u>1</u>, <u>100</u>, <u>3001</u>], range is [1,3001], return 3\nrecentCounter.ping(3002);  // requests = [1, <u>100</u>, <u>3001</u>, <u>3002</u>], range is [2,3002], return 3\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= t &lt;= 10<sup>9</sup></code></li>\n\t<li>Each test case will call <code>ping</code> with <strong>strictly increasing</strong> values of <code>t</code>.</li>\n\t<li>At most <code>10<sup>4</sup></code> calls will be made to <code>ping</code>",
+    "solutions": [
+      {
+        "filename": "0933-number-of-recent-calls.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "from collections import deque\n\nclass RecentCounter:\n\n    def __init__(self):\n        self.q = deque()\n\n    def ping(self, t: int) -> int:\n        self.q.append(t)\n        while self.q[0] < t - 3000:\n            self.q.popleft()\n        return len(self.q)",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "1071-greatest-common-divisor-of-strings": {
+    "folder": "1071-greatest-common-divisor-of-strings",
+    "description": "<h2><a href=\"https://leetcode.com/problems/greatest-common-divisor-of-strings\">1071. Greatest Common Divisor of Strings</a></h2><h3>Easy</h3><hr><p>For two strings <code>s</code> and <code>t</code>, we say &quot;<code>t</code> divides <code>s</code>&quot; if and only if <code>s = t + t + t + ... + t + t</code> (i.e., <code>t</code> is concatenated with itself one or more times).</p>\n\n<p>Given two strings <code>str1</code> and <code>str2</code>, return <em>the largest string </em><code>x</code><em> such that </em><code>x</code><em> divides both </em><code>str1</code><em> and </em><code>str2</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">str1 = &quot;ABCABC&quot;, str2 = &quot;ABC&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">&quot;ABC&quot;</span></p>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">str1 = &quot;ABABAB&quot;, str2 = &quot;ABAB&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">&quot;AB&quot;</span></p>\n</div>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">str1 = &quot;LEET&quot;, str2 = &quot;CODE&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">&quot;&quot;</span></p>\n</div>\n\n<p><strong class=\"example\">Example 4:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">str1 = &quot;AAAAAB&quot;, str2 = &quot;AAA&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">&quot;&quot;</span>​​​​​​​</p>\n</div>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= str1.length, str2.length &lt;= 1000</code></li>\n\t<li><code>str1</code> and <code>str2</code> consist of English uppercase letters.</li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "1071-greatest-common-divisor-of-strings.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    fun gcdOfStrings(str1: String, str2: String): String {\n        val biggerOne = if (str1.length >= str2.length) str1 else str2\n        val smallerOne = if (str1.length >= str2.length) str2 else str1\n\n        val smallerOnePrefixSumList = mutableListOf<String>()\n        var smallerOnePrefixSum = \"\"\n        for (char in smallerOne) {\n            smallerOnePrefixSum += char\n            smallerOnePrefixSumList.add(smallerOnePrefixSum)\n        }\n\n        // 역순으로 돌면 순회 횟수 단축 가능.\n        var answer = \"\"\n        for (prefixSum in smallerOnePrefixSumList) {\n            if (smallerOne.replace(prefixSum, \"\") == \"\" && biggerOne.replace(prefixSum, \"\") == \"\") answer = prefixSum\n        }\n        return answer\n\n        /**\n            수학적 성질(str1+str2 == str2+str1 + 유클리드 호제법)을 활용하면 훨씬 효율적으로 풀 수 있는 문제입니다.\n             -> 시간복잡도 (O(n^2)에서 O(n+m)으로 개선 가능.)\n         */\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      },
+      {
+        "filename": "1071-greatest-common-divisor-of-strings.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def gcdOfStrings(self, str1: str, str2: str) -> str:\n        if str1 + str2 != str2 + str1:\n            return \"\"\n        gcd_length = math.gcd(len(str1), len(str2))\n        return str1[:gcd_length]\n            ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "1207-unique-number-of-occurrences": {
+    "folder": "1207-unique-number-of-occurrences",
+    "description": "<h2><a href=\"https://leetcode.com/problems/unique-number-of-occurrences/?envType=study-plan-v2&envId=leetcode-75\">1207. Unique Number of Occurrences</a></h2><h3>Easy</h3><hr><p>Given an array of integers <code>arr</code>, return <code>true</code> <em>if the number of occurrences of each value in the array is <strong>unique</strong> or </em><code>false</code><em> otherwise</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> arr = [1,2,2,1,1,3]\n<strong>Output:</strong> true\n<strong>Explanation:</strong>&nbsp;The value 1 has 3 occurrences, 2 has 2 and 3 has 1. No two values have the same number of occurrences.</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> arr = [1,2]\n<strong>Output:</strong> false\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> arr = [-3,0,1,-3,1,1,1,-3,10,0]\n<strong>Output:</strong> true\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= arr.length &lt;= 1000</code></li>\n\t<li><code>-1000 &lt;= arr[i] &lt;= 1000</code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "1207-unique-number-of-occurrences.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def uniqueOccurrences(self, arr: List[int]) -> bool:\n        my_dict = dict()\n        for value in arr:\n            if value not in my_dict:\n                my_dict[value] = 1\n            else:\n                my_dict[value] += 1\n        print(my_dict)\n        if len(set(my_dict.values())) != len(my_dict):\n            return False\n        return True",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "1431-kids-with-the-greatest-number-of-candies": {
+    "folder": "1431-kids-with-the-greatest-number-of-candies",
+    "description": "<h2><a href=\"https://leetcode.com/problems/kids-with-the-greatest-number-of-candies\">1431. Kids With the Greatest Number of Candies</a></h2><h3>Easy</h3><hr><p>There are <code>n</code> kids with candies. You are given an integer array <code>candies</code>, where each <code>candies[i]</code> represents the number of candies the <code>i<sup>th</sup></code> kid has, and an integer <code>extraCandies</code>, denoting the number of extra candies that you have.</p>\n\n<p>Return <em>a boolean array </em><code>result</code><em> of length </em><code>n</code><em>, where </em><code>result[i]</code><em> is </em><code>true</code><em> if, after giving the </em><code>i<sup>th</sup></code><em> kid all the </em><code>extraCandies</code><em>, they will have the <strong>greatest</strong> number of candies among all the kids</em><em>, or </em><code>false</code><em> otherwise</em>.</p>\n\n<p>Note that <strong>multiple</strong> kids can have the <strong>greatest</strong> number of candies.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> candies = [2,3,5,1,3], extraCandies = 3\n<strong>Output:</strong> [true,true,true,false,true] \n<strong>Explanation:</strong> If you give all extraCandies to:\n- Kid 1, they will have 2 + 3 = 5 candies, which is the greatest among the kids.\n- Kid 2, they will have 3 + 3 = 6 candies, which is the greatest among the kids.\n- Kid 3, they will have 5 + 3 = 8 candies, which is the greatest among the kids.\n- Kid 4, they will have 1 + 3 = 4 candies, which is not the greatest among the kids.\n- Kid 5, they will have 3 + 3 = 6 candies, which is the greatest among the kids.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> candies = [4,2,1,1,2], extraCandies = 1\n<strong>Output:</strong> [true,false,false,false,false] \n<strong>Explanation:</strong> There is only 1 extra candy.\nKid 1 will always have the greatest number of candies, even if a different kid is given the extra candy.\n</p",
+    "solutions": [
+      {
+        "filename": "1431-kids-with-the-greatest-number-of-candies.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def kidsWithCandies(self, candies: List[int], extraCandies: int) -> List[bool]:\n        answer = []\n        for idx, candy in enumerate(candies):\n            answer.append(self.caculate(idx, candies, extraCandies))\n        return answer\n\n    def caculate(self, index: int, candies: List[int], extraCandies: int) -> bool:\n        max_candy = candies[index] + extraCandies\n\n        for idx, candy in enumerate(candies):\n            if candies[idx] - max_candy > 0: return False\n        return True\n            ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "1456-maximum-number-of-vowels-in-a-substring-of-given-length": {
+    "folder": "1456-maximum-number-of-vowels-in-a-substring-of-given-length",
+    "description": "<h2><a href=\"https://leetcode.com/problems/maximum-number-of-vowels-in-a-substring-of-given-length\">1456. Maximum Number of Vowels in a Substring of Given Length</a></h2><h3>Medium</h3><hr><p>Given a string <code>s</code> and an integer <code>k</code>, return <em>the maximum number of vowel letters in any substring of </em><code>s</code><em> with length </em><code>k</code>.</p>\n\n<p><strong>Vowel letters</strong> in English are <code>&#39;a&#39;</code>, <code>&#39;e&#39;</code>, <code>&#39;i&#39;</code>, <code>&#39;o&#39;</code>, and <code>&#39;u&#39;</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;abciiidef&quot;, k = 3\n<strong>Output:</strong> 3\n<strong>Explanation:</strong> The substring &quot;iii&quot; contains 3 vowel letters.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;aeiou&quot;, k = 2\n<strong>Output:</strong> 2\n<strong>Explanation:</strong> Any substring of length 2 contains 2 vowels.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;leetcode&quot;, k = 3\n<strong>Output:</strong> 2\n<strong>Explanation:</strong> &quot;lee&quot;, &quot;eet&quot; and &quot;ode&quot; contain 2 vowels.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= s.length &lt;= 10<sup>5</sup></code></li>\n\t<li><code>s</code> consists of lowercase English letters.</li>\n\t<li><code>1 &lt;= k &lt;= s.length</code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "1456-maximum-number-of-vowels-in-a-substring-of-given-length.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def maxVowels(self, s: str, k: int) -> int:\n        cnt = 0\n        idx = k-1\n        vowel = ['a', 'e', 'i', 'o', 'u']\n        for i in range(0, k):\n            if s[i] in vowel: cnt +=1\n        answer = cnt\n        while True:\n            if idx == len(s) -1: break\n            idx += 1\n            if s[idx] in vowel: \n                print('s[idx] : ' + s[idx])\n                cnt +=1\n            if s[idx-k] in vowel: \n                print('s[idx-k] : ' + s[idx-k])\n                cnt -= 1\n            answer = max(answer, cnt)\n        return answer\n\n            ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "1679-max-number-of-k-sum-pairs": {
+    "folder": "1679-max-number-of-k-sum-pairs",
+    "description": "<h2><a href=\"https://leetcode.com/problems/max-number-of-k-sum-pairs\">1679. Max Number of K-Sum Pairs</a></h2><h3>Medium</h3><hr><p>You are given an integer array <code>nums</code> and an integer <code>k</code>.</p>\n\n<p>In one operation, you can pick two numbers from the array whose sum equals <code>k</code> and remove them from the array.</p>\n\n<p>Return <em>the maximum number of operations you can perform on the array</em>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [1,2,3,4], k = 5\n<strong>Output:</strong> 2\n<strong>Explanation:</strong> Starting with nums = [1,2,3,4]:\n- Remove numbers 1 and 4, then nums = [2,3]\n- Remove numbers 2 and 3, then nums = []\nThere are no more pairs that sum up to 5, hence a total of 2 operations.</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums = [3,1,3,4,3], k = 6\n<strong>Output:</strong> 1\n<strong>Explanation:</strong> Starting with nums = [3,1,3,4,3]:\n- Remove the first two 3&#39;s, then nums = [1,4,3]\nThere are no more pairs that sum up to 6, hence a total of 1 operation.</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>\n\t<li><code>1 &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>\n\t<li><code>1 &lt;= k &lt;= 10<sup>9</sup></code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "1679-max-number-of-k-sum-pairs.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def maxOperations(self, nums: List[int], k: int) -> int:\n        nums.sort()\n        p_1 = 0\n        p_2 = len(nums)-1\n        answer = 0\n\n        while True:\n            sum_value = nums[p_1] + nums[p_2]\n            if sum_value == k:\n                answer += 1\n                nums.pop(p_2)\n                nums.pop(p_1)\n                p_2 -= 2\n            elif sum_value > k:\n                p_2 -= 1\n            else:\n                p_1 +=1\n            if p_1 >= p_2: break\n        return answer\n",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "1732-find-the-highest-altitude": {
+    "folder": "1732-find-the-highest-altitude",
+    "description": "<h2><a href=\"https://leetcode.com/problems/find-the-highest-altitude\">1732. Find the Highest Altitude</a></h2><h3>Easy</h3><hr><p>There is a biker going on a road trip. The road trip consists of <code>n + 1</code> points at different altitudes. The biker starts his trip on point <code>0</code> with altitude equal <code>0</code>.</p>\n\n<p>You are given an integer array <code>gain</code> of length <code>n</code> where <code>gain[i]</code> is the <strong>net gain in altitude</strong> between points <code>i</code>​​​​​​ and <code>i + 1</code> for all (<code>0 &lt;= i &lt; n)</code>. Return <em>the <strong>highest altitude</strong> of a point.</em></p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> gain = [-5,1,5,0,-7]\n<strong>Output:</strong> 1\n<strong>Explanation:</strong> The altitudes are [0,-5,-4,1,1,-6]. The highest is 1.\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> gain = [-4,-3,-2,-1,4,3,2]\n<strong>Output:</strong> 0\n<strong>Explanation:</strong> The altitudes are [0,-4,-7,-9,-10,-6,-3,-1]. The highest is 0.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>n == gain.length</code></li>\n\t<li><code>1 &lt;= n &lt;= 100</code></li>\n\t<li><code>-100 &lt;= gain[i] &lt;= 100</code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "1732-find-the-highest-altitude.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def largestAltitude(self, gain: List[int]) -> int:\n        prefixSum = [0]\n        answer = 0\n        for idx, value in enumerate(gain):\n                nextSum = value+prefixSum[idx]\n                print(nextSum)\n                prefixSum.append(nextSum)\n                answer = max(answer, nextSum)\n        return answer    ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "1768-merge-strings-alternately": {
+    "folder": "1768-merge-strings-alternately",
+    "description": "<h2><a href=\"https://leetcode.com/problems/merge-strings-alternately\">1768. Merge Strings Alternately</a></h2><h3>Easy</h3><hr><p>You are given two strings <code>word1</code> and <code>word2</code>. Merge the strings by adding letters in alternating order, starting with <code>word1</code>. If a string is longer than the other, append the additional letters onto the end of the merged string.</p>\n\n<p>Return <em>the merged string.</em></p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> word1 = &quot;abc&quot;, word2 = &quot;pqr&quot;\n<strong>Output:</strong> &quot;apbqcr&quot;\n<strong>Explanation:</strong>&nbsp;The merged string will be merged as so:\nword1:  a   b   c\nword2:    p   q   r\nmerged: a p b q c r\n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> word1 = &quot;ab&quot;, word2 = &quot;pqrs&quot;\n<strong>Output:</strong> &quot;apbqrs&quot;\n<strong>Explanation:</strong>&nbsp;Notice that as word2 is longer, &quot;rs&quot; is appended to the end.\nword1:  a   b \nword2:    p   q   r   s\nmerged: a p b q   r   s\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n\n<pre>\n<strong>Input:</strong> word1 = &quot;abcd&quot;, word2 = &quot;pq&quot;\n<strong>Output:</strong> &quot;apbqcd&quot;\n<strong>Explanation:</strong>&nbsp;Notice that as word1 is longer, &quot;cd&quot; is appended to the end.\nword1:  a   b   c   d\nword2:    p   q \nmerged: a p b q c   d\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= word1.length, word2.length &lt;= 100</code></li>\n\t<li><code>word1</code> and <code>word2</code> consist of lowercase English letters.</li>\n</ul>",
+    "solutions": [
+      {
+        "filename": "1768-merge-strings-alternately.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    fun mergeAlternately(word1: String, word2: String): String {\n        var answer = \"\"\n        for ((idx,char) in word1.withIndex()) {\n            answer += char\n            if (word2.length>idx) answer += word2[idx]\n        }\n        if (word1.length < word2.length) answer += word2.substring(word1.length)\n        return answer\n\n        /**\n            - 개선 가능 사항.\n                1. answer += char 대신 StringBuilder() 사용해서 시간복잡도 줄이기. (+= 시 불변 String이라 복사연산을 통해 새로 만드는데 복사연산이 o(n)이라고 함.)\n                2. 투포인터로 로직 개선 해서 코드 단순화. (i, j 두고 i++, j++ while  i<word1length, j<word2length)\n         */\n    }\n}",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      },
+      {
+        "filename": "1768-merge-strings-alternately.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def mergeAlternately(self, word1: str, word2: str) -> str:\n        answer = ''\n        for idx, item in enumerate(word1):\n            answer += item\n            if len(word2) > idx: answer += word2[idx]\n            if (idx == len(word1)-1 and len(word2) > len(word1)):\n                answer += word2[idx+1:]\n        return answer\n                \n\n        ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "2095-delete-the-middle-node-of-a-linked-list": {
+    "folder": "2095-delete-the-middle-node-of-a-linked-list",
+    "description": "<h2><a href=\"https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/?envType=study-plan-v2&envId=leetcode-75\">2095. Delete the Middle Node of a Linked List</a></h2><h3>Medium</h3><hr><p>You are given the <code>head</code> of a linked list. <strong>Delete</strong> the <strong>middle node</strong>, and return <em>the</em> <code>head</code> <em>of the modified linked list</em>.</p>\n\n<p>The <strong>middle node</strong> of a linked list of size <code>n</code> is the <code>&lfloor;n / 2&rfloor;<sup>th</sup></code> node from the <b>start</b> using <strong>0-based indexing</strong>, where <code>&lfloor;x&rfloor;</code> denotes the largest integer less than or equal to <code>x</code>.</p>\n\n<ul>\n\t<li>For <code>n</code> = <code>1</code>, <code>2</code>, <code>3</code>, <code>4</code>, and <code>5</code>, the middle nodes are <code>0</code>, <code>1</code>, <code>1</code>, <code>2</code>, and <code>2</code>, respectively.</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/11/16/eg1drawio.png\" style=\"width: 500px; height: 77px;\" />\n<pre>\n<strong>Input:</strong> head = [1,3,4,7,1,2,6]\n<strong>Output:</strong> [1,3,4,1,2,6]\n<strong>Explanation:</strong>\nThe above figure represents the given linked list. The indices of the nodes are written below.\nSince n = 7, node 3 with value 7 is the middle node, which is marked in red.\nWe return the new list after removing this node. \n</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/11/16/eg2drawio.png\" style=\"width: 250px; height: 43px;\" />\n<pre>\n<strong>Input:</strong> head = [1,2,3,4]\n<strong>Output:</strong> [1,2,4]\n<strong>Explanation:</strong>\nThe above figure represents the given linked list.\nFor n = 4, node 2 with value 3 is the middle node, which is marked in red.\n</pre>\n\n<p><strong class=\"example\">Example 3:</strong></p>\n<img alt=\"\" src=\"https://assets.leetcode.com/uploa",
+    "solutions": [
+      {
+        "filename": "2095-delete-the-middle-node-of-a-linked-list.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "# Definition for singly-linked list.\n# class ListNode:\n#     def __init__(self, val=0, next=None):\n#         self.val = val\n#         self.next = next\nclass Solution:\n    def deleteMiddle(self, head: Optional[ListNode]) -> Optional[ListNode]:\n        if not head or not head.next:\n            return None\n\n        slow = head\n        fast = head\n        prev = None\n\n        # fast가 끝에 도착할 때 slow는 중간에 도착.\n        # fast는 node를 두개 씩, slow는 한개 씩 이동.\n        while fast and fast.next:\n            prev = slow\n            slow = slow.next\n            fast = fast.next.next\n\n        prev.next = slow.next\n\n        return head\n        \n",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "2215-find-the-difference-of-two-arrays": {
+    "folder": "2215-find-the-difference-of-two-arrays",
+    "description": "<h2><a href=\"https://leetcode.com/problems/find-the-difference-of-two-arrays\">2215. Find the Difference of Two Arrays</a></h2><h3>Easy</h3><hr><p>Given two <strong>0-indexed</strong> integer arrays <code>nums1</code> and <code>nums2</code>, return <em>a list</em> <code>answer</code> <em>of size</em> <code>2</code> <em>where:</em></p>\n\n<ul>\n\t<li><code>answer[0]</code> <em>is a list of all <strong>distinct</strong> integers in</em> <code>nums1</code> <em>which are <strong>not</strong> present in</em> <code>nums2</code><em>.</em></li>\n\t<li><code>answer[1]</code> <em>is a list of all <strong>distinct</strong> integers in</em> <code>nums2</code> <em>which are <strong>not</strong> present in</em> <code>nums1</code>.</li>\n</ul>\n\n<p><strong>Note</strong> that the integers in the lists may be returned in <strong>any</strong> order.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums1 = [1,2,3], nums2 = [2,4,6]\n<strong>Output:</strong> [[1,3],[4,6]]\n<strong>Explanation:\n</strong>For nums1, nums1[1] = 2 is present at index 0 of nums2, whereas nums1[0] = 1 and nums1[2] = 3 are not present in nums2. Therefore, answer[0] = [1,3].\nFor nums2, nums2[0] = 2 is present at index 1 of nums1, whereas nums2[1] = 4 and nums2[2] = 6 are not present in nums2. Therefore, answer[1] = [4,6].</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> nums1 = [1,2,3,3], nums2 = [1,1,2,2]\n<strong>Output:</strong> [[3],[]]\n<strong>Explanation:\n</strong>For nums1, nums1[2] and nums1[3] are not present in nums2. Since nums1[2] == nums1[3], their value is only included once and answer[0] = [3].\nEvery integer in nums2 is present in nums1. Therefore, answer[1] = [].\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= nums1.length, nums2.length &lt;= 1000</code></li>\n\t<li><code>-1000 &lt;= nums1[i], nums2[i] &lt;= 1000</code></li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "2215-find-the-difference-of-two-arrays.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def findDifference(self, nums1: List[int], nums2: List[int]) -> List[List[int]]:\n        answer = [set(),set()]\n        for value in nums1:\n            if value not in nums2:\n                answer[0].add(value)\n        for value in nums2:\n            if value not in nums1:\n                answer[1].add(value)\n\n        answer[0] = list(answer[0])\n        answer[1] = list(answer[1])\n        return answer\n                ",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "2390-removing-stars-from-a-string": {
+    "folder": "2390-removing-stars-from-a-string",
+    "description": "<h2><a href=\"https://leetcode.com/problems/removing-stars-from-a-string\">2390. Removing Stars From a String</a></h2><h3>Medium</h3><hr><p>You are given a string <code>s</code>, which contains stars <code>*</code>.</p>\n\n<p>In one operation, you can:</p>\n\n<ul>\n\t<li>Choose a star in <code>s</code>.</li>\n\t<li>Remove the closest <strong>non-star</strong> character to its <strong>left</strong>, as well as remove the star itself.</li>\n</ul>\n\n<p>Return <em>the string after <strong>all</strong> stars have been removed</em>.</p>\n\n<p><strong>Note:</strong></p>\n\n<ul>\n\t<li>The input will be generated such that the operation is always possible.</li>\n\t<li>It can be shown that the resulting string will always be unique.</li>\n</ul>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;leet**cod*e&quot;\n<strong>Output:</strong> &quot;lecoe&quot;\n<strong>Explanation:</strong> Performing the removals from left to right:\n- The closest character to the 1<sup>st</sup> star is &#39;t&#39; in &quot;lee<strong><u>t</u></strong>**cod*e&quot;. s becomes &quot;lee*cod*e&quot;.\n- The closest character to the 2<sup>nd</sup> star is &#39;e&#39; in &quot;le<strong><u>e</u></strong>*cod*e&quot;. s becomes &quot;lecod*e&quot;.\n- The closest character to the 3<sup>rd</sup> star is &#39;d&#39; in &quot;leco<strong><u>d</u></strong>*e&quot;. s becomes &quot;lecoe&quot;.\nThere are no more stars, so we return &quot;lecoe&quot;.</pre>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<pre>\n<strong>Input:</strong> s = &quot;erase*****&quot;\n<strong>Output:</strong> &quot;&quot;\n<strong>Explanation:</strong> The entire string is removed, so we return an empty string.\n</pre>\n\n<p>&nbsp;</p>\n<p><strong>Constraints:</strong></p>\n\n<ul>\n\t<li><code>1 &lt;= s.length &lt;= 10<sup>5</sup></code></li>\n\t<li><code>s</code> consists of lowercase English letters and stars <code>*</code>.</li>\n\t<li>The operation above can be performed on <code>s</code>.</li>\n</ul>\n",
+    "solutions": [
+      {
+        "filename": "2390-removing-stars-from-a-string.py",
+        "author": "Alan",
+        "language": "Python",
+        "code": "class Solution:\n    def removeStars(self, s: str) -> str:\n        stack = []\n        for char in s:\n            if char == '*':\n                if stack:\n                    stack.pop()\n            else:\n                stack.append(char)\n        return ''.join(stack)",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  },
+  "3163-string-compression-iii": {
+    "folder": "3163-string-compression-iii",
+    "description": "<h2><a href=\"https://leetcode.com/problems/string-compression-iii\">3163. String Compression III</a></h2><h3>Medium</h3><hr><p>Given a string <code>word</code>, compress it using the following algorithm:</p>\n\n<ul>\n\t<li>Begin with an empty string <code>comp</code>. While <code>word</code> is <strong>not</strong> empty, use the following operation:\n\n\t<ul>\n\t\t<li>Remove a maximum length prefix of <code>word</code> made of a <em>single character</em> <code>c</code> repeating <strong>at most</strong> 9 times.</li>\n\t\t<li>Append the length of the prefix followed by <code>c</code> to <code>comp</code>.</li>\n\t</ul>\n\t</li>\n</ul>\n\n<p>Return the string <code>comp</code>.</p>\n\n<p>&nbsp;</p>\n<p><strong class=\"example\">Example 1:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">word = &quot;abcde&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">&quot;1a1b1c1d1e&quot;</span></p>\n\n<p><strong>Explanation:</strong></p>\n\n<p>Initially, <code>comp = &quot;&quot;</code>. Apply the operation 5 times, choosing <code>&quot;a&quot;</code>, <code>&quot;b&quot;</code>, <code>&quot;c&quot;</code>, <code>&quot;d&quot;</code>, and <code>&quot;e&quot;</code> as the prefix in each operation.</p>\n\n<p>For each prefix, append <code>&quot;1&quot;</code> followed by the character to <code>comp</code>.</p>\n</div>\n\n<p><strong class=\"example\">Example 2:</strong></p>\n\n<div class=\"example-block\">\n<p><strong>Input:</strong> <span class=\"example-io\">word = &quot;aaaaaaaaaaaaaabb&quot;</span></p>\n\n<p><strong>Output:</strong> <span class=\"example-io\">&quot;9a5a2b&quot;</span></p>\n\n<p><strong>Explanation:</strong></p>\n\n<p>Initially, <code>comp = &quot;&quot;</code>. Apply the operation 3 times, choosing <code>&quot;aaaaaaaaa&quot;</code>, <code>&quot;aaaaa&quot;</code>, and <code>&quot;bb&quot;</code> as the prefix in each operation.</p>\n\n<ul>\n\t<li>For prefix <code>&quot;aaaaaaaaa&quot;</code>, append <code>&quot;9&quot;</code> followed by <code>&quo",
+    "solutions": [
+      {
+        "filename": "3163-string-compression-iii.kt",
+        "author": "Alan",
+        "language": "Kotlin",
+        "code": "class Solution {\n    fun compressedString(word: String): String {\n        var cnt = 0\n        var answer = StringBuilder()\n        word.forEachIndexed { index, ch -> \n            if (index == 0) {cnt++}\n            else {\n                if (ch == word[index-1] && cnt !== 9) cnt++\n                else {\n                    answer.append(cnt.toString())\n                    answer.append(word[index-1])\n                    cnt = 1\n                }\n            }\n\n            if (index == word.length-1){\n                answer.append(cnt.toString())\n                answer.append(word[index])\n            }\n        }\n        return answer.toString()\n        }\n    }",
+        "timeComplexity": null,
+        "spaceComplexity": null,
+        "notes": null
+      }
+    ]
+  }
+}

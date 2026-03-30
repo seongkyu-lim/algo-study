@@ -1,0 +1,52 @@
+name: Deploy Pages
+
+on:
+  # algo-study 레포 자체 push 시 배포
+  push:
+    branches: [main]
+  # leetcode-algorithms에서 dispatch 이벤트 수신 시 배포
+  repository_dispatch:
+    types: [solutions-updated]
+  # 수동 실행
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout pages repo
+        uses: actions/checkout@v4
+
+      - name: Checkout leetcode-algorithms data
+        uses: actions/checkout@v4
+        with:
+          repository: seongkyu-lim/leetcode-algorithms
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+          path: leetcode-data
+
+      - name: Generate solutions data
+        run: python3 scripts/generate-data.py ./leetcode-data ./data
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
